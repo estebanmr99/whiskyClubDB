@@ -44,5 +44,5 @@ CREATE TABLE store_sale (
     
     CONSTRAINT FK_SaleIdStore
     FOREIGN KEY (idStore)
-    REFERENCES store(idStore),
+    REFERENCES store(idStore)
 );

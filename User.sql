@@ -33,7 +33,7 @@ CREATE TABLE user (
 
     CONSTRAINT FK_UserIdUserType
     FOREIGN KEY (idUserType)
-    REFERENCES user_type(idUserType)
+    REFERENCES user_type(idUserType),
 
     CONSTRAINT FK_UserIdLevel
     FOREIGN KEY (idLevel)

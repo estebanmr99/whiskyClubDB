@@ -3,7 +3,7 @@ CREATE DATABASE employee;
 CREATE TABLE position (
     idPosition int identity,
     name varchar(50),
-    deleted bit
+    deleted bit,
     PRIMARY KEY (idPosition)
 );
 
