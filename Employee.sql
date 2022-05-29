@@ -1,15 +1,17 @@
 CREATE DATABASE employee;
 
-CREATE TABLE position (
-    idPosition int identity,
+USE employee;
+
+CREATE TABLE department (
+    idDepartment int NOT NULL AUTO_INCREMENT,
     name varchar(50),
     deleted bit,
-    PRIMARY KEY (idPosition)
+    PRIMARY KEY (idDepartment)
 );
 
 CREATE TABLE employee (
-    idEmployee int identity,
-    idPosition int,
+    idEmployee int NOT NULL AUTO_INCREMENT,
+    idDepartment int,
     name varchar(50),
     lastName varchar(50),
     address varchar(150),
@@ -21,16 +23,16 @@ CREATE TABLE employee (
     PRIMARY KEY (idEmployee),
 
     CONSTRAINT FK_EmployeeIdPosition
-    FOREIGN KEY (idPosition)
-    REFERENCES position(idPosition)
+    FOREIGN KEY (idDepartment)
+    REFERENCES department(idDepartment)
 );
 
 CREATE TABLE review (
-    idReview int identity,
+    idReview int NOT NULL AUTO_INCREMENT,
     idEmployee int,
     idUser int,
     calification int,
-    review varchar(MAX),
+    review varchar(1500),
     createDate datetime,
     updateDate datetime,
     deleted bit,
@@ -42,10 +44,10 @@ CREATE TABLE review (
 );
 
 CREATE TABLE resolution (
-    idResolution int identity,
+    idResolution int NOT NULL AUTO_INCREMENT,
     idReview int,
     idUser int,
-    resolution varchar(MAX),
+    resolution varchar(1500),
     createDate datetime,
     updateDate datetime,
     deleted bit,

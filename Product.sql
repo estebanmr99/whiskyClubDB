@@ -1,18 +1,20 @@
 CREATE DATABASE product;
 
+USE product;
+
 CREATE TABLE product_type (
-    idType int identity,
+    idType int NOT NULL AUTO_INCREMENT,
     name varchar(50),
     deleted bit,
     PRIMARY KEY (idType)
 );
 
 CREATE TABLE product (
-    idProduct int identity,
+    idProduct int NOT NULL AUTO_INCREMENT,
     idType int,
     name varchar(50),
-    features varchar(MAX),
-    image varbinary(MAX),
+    features json,
+    image longblob,
     createDate datetime,
     updateDate datetime,
     deleted bit,
@@ -24,10 +26,10 @@ CREATE TABLE product (
 );
 
 CREATE TABLE sale (
-    idSale int identity,
+    idSale int NOT NULL AUTO_INCREMENT,
     idUser int,
-    products varchar(MAX),
-    totalSale money,
+    products json,
+    totalSale int,
     createDate datetime,
     updateDate datetime,
     deleted bit,
@@ -35,26 +37,26 @@ CREATE TABLE sale (
 );
 
 CREATE TABLE review (
-    idReview int identity,
+    idReview int NOT NULL AUTO_INCREMENT,
     idProduct int,
     idUser int,
     calification int,
-    review varchar(MAX),
+    review varchar(1500),
     createDate datetime,
     updateDate datetime,
     deleted bit,
     PRIMARY KEY (idReview),
 
     CONSTRAINT FK_ReviewIdProduct
-    FOREIGN KEY (idEmployee)
+    FOREIGN KEY (idProduct)
     REFERENCES product(idProduct)
 );
 
 CREATE TABLE resolution (
-    idResolution int identity,
+    idResolution int NOT NULL AUTO_INCREMENT,
     idReview int,
     idUser int,
-    resolution varchar(MAX),
+    resolution varchar(1500),
     createDate datetime,
     updateDate datetime,
     deleted bit,
