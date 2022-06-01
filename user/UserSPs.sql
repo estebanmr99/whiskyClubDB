@@ -3,10 +3,12 @@ CREATE PROCEDURE prcFindUserByEmail
 AS
 BEGIN
 	BEGIN TRY 
-		SELECT  idUser, idUserType, idLevel, email, password, name, lastName
-        FROM [dbo].[user]
-        WHERE email = @email
-		FOR JSON AUTO
+		SELECT (		
+			SELECT idUser, idUserType, idLevel, email, password, name, lastName
+        	FROM [dbo].[user]
+        	WHERE email = @email
+			FOR JSON AUTO
+		) AS userFound
 
 	END TRY 
 	BEGIN CATCH
