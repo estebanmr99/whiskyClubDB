@@ -117,7 +117,7 @@ CREATE TABLE [user] (
     idUserType int,
     idLevel int,
     email varchar(50),
-    password varchar(50),
+    password varchar(255),
     name varchar(50),
     lastName varchar(50),
     telephone varchar(30),
