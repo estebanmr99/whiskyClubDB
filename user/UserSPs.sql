@@ -23,6 +23,6 @@ BEGIN
 	END CATCH
 
 END
-GO;
+GO
 
 -- EXECUTE prcFindUserByEmail @email = 'usAdmin@whiskyclub.com';
