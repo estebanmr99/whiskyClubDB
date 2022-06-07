@@ -1,24 +1,25 @@
 CREATE PROCEDURE prcFindUserByEmail
-@emailParam varchar(50)
+@emailParam varchar(50),
+@select bit = 1
 AS
 BEGIN
 	BEGIN TRY
 
-		DROP TABLE IF EXISTS #user
-		CREATE TABLE #user (userFound varchar(MAX));
+		TRUNCATE TABLE [masterdb].[dbo].[tempUserJson]
 
-		INSERT INTO #user
+		INSERT INTO [masterdb].[dbo].[tempUserJson]
 		EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindUserByEmail] @email = @emailParam;
 
-		INSERT INTO #user
+		INSERT INTO [masterdb].[dbo].[tempUserJson]
 		EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindUserByEmail] @email = @emailParam;
 
-		INSERT INTO #user
+		INSERT INTO [masterdb].[dbo].[tempUserJson]
 		EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindUserByEmail] @email = @emailParam;
 
-		SELECT userFound FROM #user WHERE userFound IS NOT NULL;
+		DELETE [masterdb].[dbo].[tempUserJson] WHERE userFound IS NULL;
 
-		DROP TABLE #user;
+		IF @select = 1
+			SELECT userFound FROM [masterdb].[dbo].[tempUserJson] WHERE userFound IS NOT NULL;
 
 	END TRY 
 	BEGIN CATCH
@@ -35,28 +36,34 @@ BEGIN
 END
 GO
 
--- EXECUTE prcFindUserByEmail @email = 'usAdmin@whiskyclub.com';
+-- EXECUTE prcFindUserByEmail @emailParam = 'usAdmin@whiskyclub.com';
 
 CREATE PROCEDURE prcGetNextUserId
+@select bit = 1
 AS
 BEGIN
 	BEGIN TRY
+		TRUNCATE TABLE [masterdb].[dbo].[tempNextUserId];
+		DECLARE @maxIDuser INT;
 
-		DROP TABLE IF EXISTS #user
-		CREATE TABLE #user (maxIDuser varchar(MAX));
-
-		INSERT INTO #user
+		INSERT INTO [masterdb].[dbo].[tempNextUserId]
 		EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcGetNextUserId];
 
-		INSERT INTO #user
+		INSERT INTO [masterdb].[dbo].[tempNextUserId]
 		EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcGetNextUserId];
 
-		INSERT INTO #user
+		INSERT INTO [masterdb].[dbo].[tempNextUserId]
 		EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcGetNextUserId];
 
-		SELECT MAX(maxIDuser) + 1 FROM #user;
+		SELECT @maxIDuser = (MAX(maxIDuser) + 1) FROM [masterdb].[dbo].[tempNextUserId];
 
-		DROP TABLE #user;
+		INSERT INTO [masterdb].[dbo].[tempNextUserId]
+		VALUES (@maxIDuser);
+
+		DELETE [masterdb].[dbo].[tempNextUserId] WHERE maxIDuser < @maxIDuser;
+
+		IF @select = 1
+			SELECT @maxIDuser AS maxIDuser;
 
 	END TRY 
 	BEGIN CATCH
@@ -87,25 +94,16 @@ CREATE PROCEDURE prcRegisterUser
 AS
 BEGIN
 	BEGIN TRY 
+		EXECUTE [masterdb].[dbo].[prcFindUserByEmail] @emailParam = @emailParam, @select = 0;
 
-		DROP TABLE IF EXISTS #user
-		CREATE TABLE #user (userFound varchar(MAX));
-
-		INSERT INTO #user
-		EXECUTE [masterdb].[dbo].[prcFindUserByEmail] @email = @emailParam;
-
-		IF NOT EXISTS (SELECT * FROM #user)
+		IF NOT EXISTS (SELECT * FROM [masterdb].[dbo].[tempUserJson])
 			BEGIN
-				DROP TABLE IF EXISTS #idUser
-				CREATE TABLE #idUser (maxIDuser varchar(MAX));
-
-				INSERT INTO #idUser
-				EXECUTE [masterdb].[dbo].[prcGetNextUserId];
+				EXECUTE [masterdb].[dbo].[prcGetNextUserId] @select = 0;
 
 				DECLARE @maxIDuser int;
-				SELECT @maxIDuser = maxIDuser FROM #idUser;
+				SELECT @maxIDuser = MAX(maxIDuser) FROM [dbo].[tempNextUserId];
 
-				IF @country = 'Unites States'
+				IF @country = 'United States'
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcRegisterUser] @iduser = @maxIDuser, @email = @emailParam, @password = @passwordParam, @locationLat = @locationLatParam, @locationLng = @locationLngParam, @name = @nameParam, @lastName = @lastnameParam, @telephone = @telephoneParam;
 				ELSE IF @country = 'Scotland'
 					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcRegisterUser] @iduser = @maxIDuser, @email = @emailParam, @password = @passwordParam, @locationLat = @locationLatParam, @locationLng = @locationLngParam, @name = @nameParam, @lastName = @lastnameParam, @telephone = @telephoneParam;
