@@ -17,7 +17,6 @@ EXEC master.dbo.sp_serveroption @server=N'34.135.158.74', @optname=N'rpc out', @
 EXEC master.dbo.sp_serveroption @server=N'34.135.158.74', @optname = 'remote proc transaction promotion', @optvalue = 'false' ;
 EXEC master.dbo.sp_serveroption @server=N'34.135.158.74', @optname=N'name', @optvalue=N'IRELANDSQL';
 
-
 --Unitedstatessql 
 EXEC master.dbo.sp_addlinkedserver @server = N'34.136.239.50', @srvproduct=N'SQL Server';
 EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname=N'34.136.239.50',@useself=N'False',
@@ -33,7 +32,7 @@ EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname=N'UNIVERSAL-MYSQL',@useself=N'F
 EXEC master.dbo.sp_serveroption @server=N'UNIVERSAL-MYSQL', @optname=N'rpc', @optvalue=N'true';
 EXEC master.dbo.sp_serveroption @server=N'UNIVERSAL-MYSQL', @optname=N'rpc out', @optvalue=N'true';
 
-select * from [IRELANDSQL].[ie_store1].[dbo].[employee]
-select * from openquery([IRELANDSQL], 'select * from [ie_store1].[dbo].[store]') --para columnas con ubicacion
-EXEC ('SELECT * FROM employee.department') AT [UNIVERSAL-MYSQL] 
-EXEC ('SELECT * FROM product.product') AT [UNIVERSAL-MYSQL] 
+-- select * from [IRELANDSQL].[ie_store1].[dbo].[employee]
+-- select * from openquery([IRELANDSQL], 'select * from [ie_store1].[dbo].[store]') --para columnas con ubicacion
+-- EXEC ('SELECT * FROM employee.department') AT [UNIVERSAL-MYSQL] 
+-- EXEC ('SELECT * FROM product.product') AT [UNIVERSAL-MYSQL] 
