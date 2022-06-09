@@ -5,14 +5,14 @@ CREATE DATABASE ie_user;
 USE ie_user;
 
 CREATE TABLE user_type (
-    idUserType int,
+    idUserType int identity,
     name varchar(50),
     deleted bit,
     PRIMARY KEY (idUserType)
 );
 
 CREATE TABLE level (
-    idLevel int,
+    idLevel int identity,
     description varchar(MAX),
     discProduct int,
     discShipping int,
@@ -25,7 +25,7 @@ CREATE TABLE [user] (
     idUserType int,
     idLevel int,
     email varchar(50),
-    password varchar(50),
+    password varchar(255),
     name varchar(50),
     lastName varchar(50),
     telephone varchar(30),
@@ -71,7 +71,7 @@ CREATE TABLE [user] (
     idUserType int,
     idLevel int,
     email varchar(50),
-    password varchar(50),
+    password varchar(255),
     name varchar(50),
     lastName varchar(50),
     telephone varchar(30),
