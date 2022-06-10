@@ -94,8 +94,7 @@ BEGIN
 		SELECT (		
 			SELECT idProduct, idType, name 
         	FROM 
-				EXECUTE ('SELECT * FROM product.product') AT [UNIVERSAL-MYSQL] 
-        	WHERE name = @name
+			OPENQUERY ([UNIVERSAL-MYSQL] , 'SELECT * FROM product.product WHERE name = @name') 
 			FOR JSON AUTO
 		) AS productFound
 
@@ -177,8 +176,8 @@ CREATE PROCEDURE prcGetNextProductId
 AS
 BEGIN
 	BEGIN TRY 
-		Execute ('SELECT MAX(idProduct) as maxIDuser
-		FROM product.product') AT [UNIVERSAL-MYSQL] 
+		Execute OPENQUERY([UNIVERSAL-MYSQL], 'SELECT MAX(idProduct) as maxIDuser
+		FROM product.product')  
 	END TRY 
 	BEGIN CATCH
 	SELECT
