@@ -135,8 +135,6 @@ GO
 
 -- EXECUTE prcRegisterUser @email = 'usAdmin@whiskyclub.com';
 
-
-
 -- ----------------------------
 
 --- Store procedure FindProductByName (Masterdb)
@@ -179,7 +177,7 @@ END
 GO
 
 
-EXECUTE prcFindProductByName @nameParam = 'Wisky';
+-- EXECUTE prcFindProductByName @nameParam = 'Wisky';
 
 
 -- Store procedure to get next Product ID (Masterdb)
@@ -224,8 +222,6 @@ BEGIN
 
 END
 GO
-
-
 
 
 --- Store procedure CreateProduct (Masterdb)
@@ -321,3 +317,183 @@ BEGIN
 
 END
 GO
+
+
+-- EXECUTE prcRegisterUser @email = 'usAdmin@whiskyclub.com';
+
+CREATE PROCEDURE prcGetStoresInfo
+AS
+BEGIN
+	BEGIN TRY
+		DECLARE @storesInfo TABLE
+		(idStore int, 
+		 name varchar(50),
+		 country varchar(30)
+		);
+
+		-- Ireland stores info
+		INSERT INTO @storesInfo
+		EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcGetStoresInfo]
+
+		-- Scotland stores info
+		INSERT INTO @storesInfo
+		EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcGetStoresInfo]
+
+		-- United States stores info
+		INSERT INTO @storesInfo
+		EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcGetStoresInfo]
+
+		SELECT (SELECT idStore, name, country FROM @storesInfo FOR JSON AUTO) AS storesInfo
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+-- EXECUTE prcGetStoresInfo
+-- DROP PROCEDURE prcGetStoresInfo
+
+CREATE PROCEDURE prcGetProductsInfo
+AS
+BEGIN
+	BEGIN TRY
+		DECLARE @productsInfo TABLE
+		(idProduct int, 
+		 name varchar(50)
+		);
+
+		INSERT INTO @productsInfo
+		SELECT * FROM OPENQUERY ([UNIVERSAL-MYSQL] , 'SELECT idProduct, name FROM product.product')
+
+		IF EXISTS (SELECT idProduct, name FROM @productsInfo)
+			SELECT (SELECT idProduct, name FROM @productsInfo FOR JSON AUTO) AS productsInfo
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+-- EXECUTE prcGetProductsInfo
+-- DROP PROCEDURE prcGetProductsInfo
+
+CREATE PROCEDURE prcGetStoresInventory
+AS
+BEGIN
+	BEGIN TRY
+
+		DECLARE @storesInventory TABLE
+		(idProduct int, 
+		 currency varchar(30),
+		 localPrice money,
+		 globalPrice money,
+		 quantity int,
+		 idStore int
+		);
+
+				-- Ireland stores info
+		INSERT INTO @storesInventory
+		EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcGetStoresInventory]
+
+		-- Scotland stores info
+		INSERT INTO @storesInventory
+		EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcGetStoresInventory]
+
+		-- United States stores info
+		INSERT INTO @storesInventory
+		EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcGetStoresInventory]
+
+		IF EXISTS (SELECT idProduct FROM @storesInventory)
+			SELECT (SELECT idProduct, currency, localPrice, globalPrice, quantity, idStore FROM @storesInventory FOR JSON AUTO, INCLUDE_NULL_VALUES) AS storesInventory
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+-- EXECUTE prcGetStoresInventory
+
+CREATE PROCEDURE prcUpdateStoreInventory
+@idStoreParam int,
+@idProductParam int,
+@currencyParam varchar(30),
+@localPriceParam int,
+@globalPriceParam int,
+@quantityParam int,
+@country varchar(30)
+AS
+BEGIN
+	BEGIN TRY
+
+		IF @country = 'United States'
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([UNITEDSTATESSQL] , 'SELECT idStore FROM [usa_store1].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([UNITEDSTATESSQL] , 'SELECT idStore FROM [usa_store2].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [UNITEDSTATESSQL].[usa_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([UNITEDSTATESSQL] , 'SELECT idStore FROM [usa_store3].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [UNITEDSTATESSQL].[usa_store3].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+		ELSE IF @country = 'Scotland'
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([SCOTLANDSQL] , 'SELECT idStore FROM [stk_store1].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([SCOTLANDSQL] , 'SELECT idStore FROM [stk_store2].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [SCOTLANDSQL].[stk_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([SCOTLANDSQL] , 'SELECT idStore FROM [stk_store3].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [SCOTLANDSQL].[stk_store3].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+		ELSE IF @country = 'Ireland'
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([IRELANDSQL] , 'SELECT idStore FROM [ie_store1].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([IRELANDSQL] , 'SELECT idStore FROM [ie_store2].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [IRELANDSQL].[ie_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+			IF EXISTS(SELECT idStore FROM OPENQUERY ([IRELANDSQL] , 'SELECT idStore FROM [ie_store3].[dbo].[store]') WHERE idStore = @idStoreParam)
+				EXECUTE [IRELANDSQL].[ie_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+		ELSE
+			RAISERROR ( 'Whoops, an error occurred: Country not found', 11, 1);
+
+		SELECT 'Updated';
+
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+-- EXECUTE prcUpdateStoreInventory

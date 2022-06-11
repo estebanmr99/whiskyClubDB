@@ -39,6 +39,7 @@ CREATE TABLE store (
 
 CREATE TABLE product (
     idProduct int,
+    currency varchar(30),
     localPrice money,
     globalPrice money,
     deleted bit,
