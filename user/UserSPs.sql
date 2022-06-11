@@ -176,8 +176,8 @@ CREATE PROCEDURE prcGetNextProductId
 AS
 BEGIN
 	BEGIN TRY 
-		Execute OPENQUERY([UNIVERSAL-MYSQL], 'SELECT MAX(idProduct) as maxIDuser
-		FROM product.product')  
+		Exec( 'SELECT MAX(idProduct) as maxIDuser
+		FROM product.product') AT [UNIVERSAL-MYSQL]  
 	END TRY 
 	BEGIN CATCH
 	SELECT
