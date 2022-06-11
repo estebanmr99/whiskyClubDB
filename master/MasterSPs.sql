@@ -283,3 +283,41 @@ BEGIN
 
 END
 GO
+
+-- Store procedure for subscriptions
+CREATE PROCEDURE prcSubscription
+@idUser int,
+@idLevel int,
+@country varchar(30)
+
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+
+				IF @country = 'United States'
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcSubscription] @iduser = @iduser, @idLevel = @idLevel;
+				ELSE IF @country = 'Scotland'
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcSubscription] @iduser = @iduser, @idLevel = @idLevel;
+				ELSE IF @country = 'Ireland'
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcSubscription] @iduser = @iduser, @idLevel = @idLevel;
+				ELSE
+					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+				SELECT 'Subscription Updated';
+			END
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
