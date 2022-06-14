@@ -35,4 +35,5 @@ EXEC master.dbo.sp_serveroption @server=N'UNIVERSAL-MYSQL', @optname=N'rpc out',
 -- select * from [IRELANDSQL].[ie_store1].[dbo].[employee]
 -- select * from openquery([IRELANDSQL], 'select * from [ie_store1].[dbo].[store]') --para columnas con ubicacion
 -- EXEC ('SELECT * FROM employee.department') AT [UNIVERSAL-MYSQL] 
+--select * from OPENQUERY([UNIVERSAL-MYSQL], 'SELECT * FROM employee.employee')
 -- EXEC ('SELECT * FROM product.product') AT [UNIVERSAL-MYSQL] 
