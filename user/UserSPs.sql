@@ -83,50 +83,22 @@ GO
 
 -- -------------------------
 
----Store Procedure, find product by name 
 
 
-CREATE PROCEDURE prcFindProductByName
-@name varchar(50)
-AS
-BEGIN
-	BEGIN TRY 
-		SELECT (		
-			SELECT idProduct, idType, name 
-        	FROM 
-			OPENQUERY ([UNIVERSAL-MYSQL] , 'SELECT * FROM product.product WHERE name = @name') 
-			FOR JSON AUTO
-		) AS productFound
-
-	END TRY 
-	BEGIN CATCH
-	SELECT
-	  ERROR_NUMBER() AS ErrorNumber  
-            ,ERROR_SEVERITY() AS ErrorSeverity  
-            ,ERROR_STATE() AS ErrorState  
-            ,ERROR_PROCEDURE() AS ErrorProcedure  
-            ,ERROR_LINE() AS ErrorLine  
-            ,ERROR_MESSAGE() AS ErrorMessage;
-
-	END CATCH
-
-END
-GO
-
-
--- Insert productds on US stores (US_User)
-CREATE PROCEDURE prcCreateProductUS
+-- CREATE PRODUCT USER USA
+CREATE PROCEDURE prcCreateProduct
 @idProduct int,
+@globalPrice money
 AS
 BEGIN
 	BEGIN TRY 
 
-		INSERT INTO [dbo].[usa_store1].[product] (idProduct)
-		VALUES (@idProduct);
-		INSERT INTO [dbo].[usa_store2].[product] (idProduct)
-		VALUES (@idProduct);
-		INSERT INTO [dbo].[usa_store3].[product] (idProduct)
-		VALUES (@idProduct);
+		INSERT INTO [dbo].[usa_store1].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [dbo].[usa_store2].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [dbo].[usa_store3].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -143,41 +115,21 @@ END
 GO
 
 
--- Insert products on STK stores (STK_User)
-CREATE PROCEDURE prcCreateProductSTK
+
+-- CREATE PRODUCT USER SCOTLAN
+CREATE PROCEDURE prcCreateProduct
 @idProduct int,
+@globalPrice money
 AS
 BEGIN
 	BEGIN TRY 
 
-		INSERT INTO [dbo].[stk_store1].[product] (idProduct)
-		VALUES (@idProduct);
-		INSERT INTO [dbo].[stk_store2].[product] (idProduct)
-		VALUES (@idProduct);
-		INSERT INTO [dbo].[stk_store3].[product] (idProduct)
-		VALUES (@idProduct);
-	END TRY 
-	BEGIN CATCH
-	SELECT
-	  ERROR_NUMBER() AS ErrorNumber  
-            ,ERROR_SEVERITY() AS ErrorSeverity  
-            ,ERROR_STATE() AS ErrorState  
-            ,ERROR_PROCEDURE() AS ErrorProcedure  
-            ,ERROR_LINE() AS ErrorLine  
-            ,ERROR_MESSAGE() AS ErrorMessage;
-
-	END CATCH
-
-END
-GO
-
--- Store procedure to get next Product ID (User)
-CREATE PROCEDURE prcGetNextProductId
-AS
-BEGIN
-	BEGIN TRY 
-		Exec( 'SELECT MAX(idProduct) as maxIDuser
-		FROM product.product') AT [UNIVERSAL-MYSQL]  
+		INSERT INTO [dbo].[stk_store1].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [dbo].[stk_store2].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [dbo].[stk_store3].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -196,19 +148,21 @@ GO
 
 
 
--- Insert products on IE stores (IE_User)
-CREATE PROCEDURE prcCreateProductIE
+
+-- CREATE PRODUCT USER IRELAND
+CREATE PROCEDURE prcCreateProduct
 @idProduct int,
+@globalPrice money
 AS
 BEGIN
 	BEGIN TRY 
 
-		INSERT INTO [dbo].[ie_store1].[product] (idProduct)
-		VALUES (@idProduct);
-		INSERT INTO [dbo].[ie_store2].[product] (idProduct)
-		VALUES (@idProduct);
-		INSERT INTO [dbo].[ie_store3].[product] (idProduct)
-		VALUES (@idProduct);
+		INSERT INTO [dbo].[ie_store1].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [dbo].[ie_store2].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [dbo].[ie_store3].[product] (idProduct, globalPrice)
+		VALUES (@idProduct, @globalPrice);
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -223,7 +177,6 @@ BEGIN
 
 END
 GO
-
 
 
 CREATE PROCEDURE prcSubscription
