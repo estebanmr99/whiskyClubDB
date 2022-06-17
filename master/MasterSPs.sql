@@ -565,3 +565,119 @@ GO
 
 -- EXECUTE prcFindEmploBySotre @store = 1,@idEmployee= 1, @country = 'Ireland'
 
+
+
+--
+CREATE PROCEDURE prcUpdateEmploBySotre
+@store int,
+@idEmployee int,
+@name varchar(50),
+@lastName varchar(50),
+@birthDate varchar(50),
+@localSalary money,
+@globalSalary money,
+@country varchar(50)
+AS
+BEGIN
+	BEGIN TRY 
+		DECLARE @select varchar(150),@update varchar(150),@sql varchar(300)
+		set @select = 'update OPENQUERY([UNIVERSAL-MYSQL],
+					''SELECT idEmployee,name,lastName,birthDate,updateDate FROM employee.employee where (idEmployee ='+ CAST(@idEmployee as nvarchar(30))+')'')'
+		set @update = 'set name = '+QUOTENAME(@name,'''')+   
+					   ', lastName = '+QUOTENAME(@lastName,'''')+
+					   ', birthDate = '+QUOTENAME(@birthDate,'''')+
+					   ', updateDate = '+QUOTENAME((SELECT CONVERT(varchar, getdate(), 23)),'''')
+
+		set @sql = @select + @update
+
+
+        BEGIN
+            IF @country = 'United States'
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcUpdateEmploBySotre] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+				ELSE IF @country = 'Scotland'
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcUpdateEmploBySotre] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+				ELSE IF @country = 'Ireland'
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcUpdateEmploBySotre] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary;
+				ELSE
+					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+            END
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+
+--EXEC prcUpdateEmploBySotre
+--@store =7,
+--@idEmployee =10,
+--@name ='froilan',
+--@lastName ='velasuqez',
+--@birthDate ='31-12-2020',
+--@localSalary =1000,
+--@globalSalary =0,
+--@country= 'United States'
+
+
+--select * from [UNITEDSTATESSQL].[usa_store1].[dbo].[employee]
+
+CREATE PROCEDURE prcInsertEmploBySotre
+@store int,
+@name varchar(50),
+@lastName varchar(50),
+@birthDate date,
+@localSalary money,
+@globalSalary money,
+@country varchar(50)
+AS
+BEGIN
+	BEGIN TRY 
+        DECLARE @maxIDuser int;
+        SET @maxIDuser = 0; 
+		SELECT @maxIDuser = MAX(idEmployee) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idEmployee FROM employee.employee')
+		SET @maxIDuser = @maxIDuser+1; 
+        
+			BEGIN
+					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idEmployee,name,lastName,birthDate,createDate,updateDate,deleted FROM employee.employee')   
+					VALUES(@maxIDuser,@name,@lastName,@birthDate,(SELECT GETDATE()),(SELECT GETDATE()),0)
+            IF @country = 'United States'
+
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcInsertEmploBySotre] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+				
+			ELSE IF @country = 'Scotland'
+
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcInsertEmploBySotre] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+					
+			ELSE IF @country = 'Ireland'
+
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcInsertEmploBySotre] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary;
+					
+			ELSE
+					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+            END
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+
+
