@@ -309,7 +309,6 @@ BEGIN
 			Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
-        SELECT 'Succes';
 			END
 
 	END TRY 
@@ -355,7 +354,6 @@ BEGIN
 			Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
-        SELECT 'Succes';
 			END
 
 	END TRY 
@@ -397,7 +395,6 @@ BEGIN
 			Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
-        SELECT 'Succes';
 			END
 
 	END TRY 
