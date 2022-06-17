@@ -284,6 +284,137 @@ GO
 
 
 
+--USER IRELAND
+
+
+CREATE PROCEDURE prcFindEmployeesBySotre
+@store int
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+				IF @store = 1
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store1].[dbo].[employee] eh
+					WHERE deleted = 0 
+
+
+        ELSE IF @store = 2
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store2].[dbo].[employee] eh
+					WHERE deleted = 0 
+
+        ELSE IF @store = 3
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store3].[dbo].[employee] eh
+					WHERE deleted = 0 
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        SELECT 'Succes';
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
+exec prcFindEmployeesBySotre @store=3
+
+
+
+
+--USER SCOTLAND
+
+CREATE PROCEDURE prcFindEmployeesBySotre
+@store int
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+				IF @store = 4
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store1].[dbo].[employee] eh
+					WHERE deleted = 0 
+
+
+        ELSE IF @store = 5
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store2].[dbo].[employee] eh
+					WHERE deleted = 0 
+
+        ELSE IF @store = 6
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store3].[dbo].[employee] eh
+					WHERE deleted = 0 
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        SELECT 'Succes';
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
+
+--USER USA
+
+CREATE PROCEDURE prcFindEmployeesBySotre
+@store int
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+				IF @store = 7
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store1].[dbo].[employee] eh
+					WHERE deleted =0
+
+
+        ELSE IF @store = 8
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store2].[dbo].[employee] eh
+					WHERE deleted =0 
+
+        ELSE IF @store = 9
+					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store3].[dbo].[employee] eh
+					WHERE deleted =0 
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        SELECT 'Succes';
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
+
 --USER USA
 
 CREATE PROCEDURE prcFindEmploBySotre
