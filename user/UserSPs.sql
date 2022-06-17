@@ -733,3 +733,138 @@ END
 GO
 
 
+
+
+
+
+--USER IRELAND
+
+CREATE PROCEDURE prcDeleteEmploBySotre
+@store int,
+@idEmployee int
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+		IF @store = 1
+					UPDATE [ie_store1].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+        ELSE IF @store = 2
+					UPDATE [ie_store2].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+
+        ELSE IF @store = 3
+					UPDATE [ie_store3].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
+
+--USER SCOTLAND
+
+CREATE PROCEDURE prcDeleteEmploBySotre
+@store int,
+@idEmployee int
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+		IF @store = 3
+					UPDATE [stk_store1].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+        ELSE IF @store = 4
+					UPDATE [stk_store2].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+
+        ELSE IF @store = 5
+					UPDATE [stk_store3].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
+
+--USER USA
+
+CREATE PROCEDURE prcDeleteEmploBySotre
+@store int,
+@idEmployee int
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+		IF @store = 7
+					UPDATE [usa_store1].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+        ELSE IF @store = 8
+					UPDATE [usa_store2].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+
+        ELSE IF @store = 9
+					UPDATE [usa_store3].[dbo].[employee]
+					SET deleted = 1
+					WHERE idEmployee = @idEmployee
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
