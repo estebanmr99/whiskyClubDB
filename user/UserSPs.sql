@@ -599,3 +599,137 @@ BEGIN
 END
 GO
 
+
+
+
+
+--USER IRELAND
+
+CREATE PROCEDURE prcInsertEmploBySotre
+@store int,
+@idEmployee int, 
+@localSalary money,
+@globalSalary money
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+		IF @store = 1
+					INSERT INTO [ie_store1].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+        ELSE IF @store = 2
+					INSERT INTO [ie_store2].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+
+        ELSE IF @store = 3
+					INSERT INTO [ie_store3].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
+
+
+--USER SCOTLAND
+
+CREATE PROCEDURE prcInsertEmploBySotre
+@store int,
+@idEmployee int, 
+@localSalary money,
+@globalSalary money
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+		IF @store = 4
+					INSERT INTO [stk_store1].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+        ELSE IF @store = 5
+					INSERT INTO [stk_store2].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+
+        ELSE IF @store = 6
+					INSERT INTO [stk_store3].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
+
+
+--USER USA
+
+CREATE PROCEDURE prcInsertEmploBySotre
+@store int,
+@idEmployee int, 
+@localSalary money,
+@globalSalary money
+AS
+BEGIN
+	BEGIN TRY 
+			BEGIN
+		IF @store = 7
+					INSERT INTO [usa_store1].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+        ELSE IF @store = 8
+					INSERT INTO [usa_store2].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+
+        ELSE IF @store = 9
+					INSERT INTO [usa_store3].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
+					VALUES (@idEmployee,@localSalary, @globalSalary,0)
+          
+			Else
+			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+        
+			END
+
+	END TRY 
+		BEGIN CATCH
+			SELECT
+			  ERROR_NUMBER() AS ErrorNumber  
+					,ERROR_SEVERITY() AS ErrorSeverity  
+					,ERROR_STATE() AS ErrorState  
+					,ERROR_PROCEDURE() AS ErrorProcedure  
+					,ERROR_LINE() AS ErrorLine  
+					,ERROR_MESSAGE() AS ErrorMessage;
+		END CATCH
+END
+GO
+
+
