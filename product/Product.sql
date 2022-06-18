@@ -1,6 +1,7 @@
 CREATE DATABASE product;
 
 USE product;
+SET sql_mode='NO_AUTO_VALUE_ON_ZERO';
 
 CREATE TABLE product_type (
     idType int NOT NULL AUTO_INCREMENT,

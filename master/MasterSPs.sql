@@ -954,24 +954,24 @@ BEGIN
 			FROM @storeProducts
 			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
 					(idType = isnull(@idType, idType)) AND 
-					(distanceUser <= isnull(@distance, distanceUser)) --AND 
-					--(localPrice <= isnull(@price, localPrice))
+					(distanceUser <= isnull(@distance, distanceUser)) AND 
+					(localPrice <= isnull(@price, localPrice))
 			ORDER BY productName ASC
 		ELSE IF @order = 'Desc'
 			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
 			FROM @storeProducts
 			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
 					(idType = isnull(@idType, idType)) AND 
-					(distanceUser <= isnull(@distance, distanceUser)) --AND 
-					--(localPrice <= isnull(@price, localPrice))
+					(distanceUser <= isnull(@distance, distanceUser)) AND 
+					(localPrice <= isnull(@price, localPrice))
 			ORDER BY productName DESC
 		ELSE IF @order = 'Popular'
 			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
 			FROM @storeProducts
 			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
 					(idType = isnull(@idType, idType)) AND 
-					(distanceUser <= isnull(@distance, distanceUser)) --AND 
-					--(localPrice <= isnull(@price, localPrice))
+					(distanceUser <= isnull(@distance, distanceUser)) AND 
+					(localPrice <= isnull(@price, localPrice))
 			ORDER BY sales DESC
 		ELSE
 			RAISERROR ( 'Whoops, an error occurred: Order not possible', 11, 1);
