@@ -566,6 +566,82 @@ GO
 -- EXECUTE prcFindEmploBySotre @store = 1,@idEmployee= 1, @country = 'Ireland'
 --EXECUTE prcFindEmploBySotre @store = 9,@idEmployee= 12, @country = 'United States'
 
+
+
+CREATE PROCEDURE prcFindEmployeesBySotre
+@store int,
+@country varchar(50)
+AS
+BEGIN
+	BEGIN TRY 
+
+	DECLARE @storesEmployeesMYSQL TABLE
+			(idEmployee int, 
+			 idDepartment int, 
+			 name varchar(30),
+			 lastName varchar(30),
+			 address varchar(30),
+			 telephone varchar(30),
+			 birthDate date,
+			 createDate date,
+			 updateDate date,
+			 deleted bit
+			);
+
+			DECLARE @storesEmployees TABLE
+			(idEmployee int, 
+			 localSalary money, 
+			 globalSalary money,
+			 deleted bit
+			);
+			
+
+		insert into @storesEmployeesMYSQL
+		select * from OPENQUERY([UNIVERSAL-MYSQL], 'SELECT * FROM employee.employee')
+			BEGIN
+				IF @country = 'United States'
+					insert into @storesEmployees
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindEmployeesBySotre] @store = @store;
+				ELSE IF @country = 'Scotland'
+					insert into @storesEmployees
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindEmployeesBySotre]@store = @store;
+				ELSE IF @country = 'Ireland'
+					insert into @storesEmployees
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindEmployeesBySotre]@store = @store ;
+				ELSE
+					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+
+          
+			END
+
+			select(
+			select Eh.idEmployee, Ep.name, Ep.lastName, Ep.birthDate,Eh.localSalary,Eh.globalSalary from @storesEmployeesMYSQL Ep
+            inner join (select * from @storesEmployees ) Eh on Eh.idEmployee = Ep.idEmployee
+            where Eh.deleted = 0
+            FOR JSON AUTO
+            )as employees
+
+        SELECT 'Succes';
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+
+
+
+
 CREATE PROCEDURE CRUD_product_type
 	@idType INT,
     @name VARCHAR(50),
