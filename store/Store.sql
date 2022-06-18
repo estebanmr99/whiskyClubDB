@@ -40,6 +40,7 @@ CREATE TABLE store (
 CREATE TABLE product (
     idProduct int,
     currency varchar(30),
+    image varbinary(max),
     localPrice money,
     globalPrice money,
     deleted bit,
