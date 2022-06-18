@@ -88,19 +88,20 @@ GO
 -- CREATE PRODUCT USER USA
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
-@globalPrice money
+@globalPrice money,
+@image nvarchar(max)
 AS
 BEGIN
 		DECLARE @localPrice money
 		 set @localPrice = @globalPrice
 	BEGIN TRY 
 
-		INSERT INTO [usa_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice);
-		INSERT INTO [usa_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice);
-		INSERT INTO [usa_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice);
+		INSERT INTO [usa_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice, @image);
+		INSERT INTO [usa_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice, @image);
+		INSERT INTO [usa_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice, @image);
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -121,7 +122,8 @@ GO
 -- CREATE PRODUCT USER IRELAND
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
-@globalPrice money
+@globalPrice money,
+@image nvarchar(max)
 AS
 BEGIN
 		DECLARE @localPrice money
@@ -129,12 +131,12 @@ BEGIN
 	BEGIN TRY 
 		
 
-		INSERT INTO [ie_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice);
-		INSERT INTO [ie_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice);
-		INSERT INTO [ie_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice);
+		INSERT INTO [ie_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice, @image);
+		INSERT INTO [ie_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice, @image);
+		INSERT INTO [ie_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice, @image);
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -155,7 +157,8 @@ GO
 -- CREATE PRODUCT USER SCOTLAND
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
-@globalPrice money
+@globalPrice money,
+@image nvarchar(max)
 AS
 BEGIN
 		DECLARE @localPrice money
@@ -164,12 +167,12 @@ BEGIN
 		
 
 
-		INSERT INTO [stk_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice);
-		INSERT INTO [stk_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice);
-		INSERT INTO [stk_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
-		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice);
+		INSERT INTO [stk_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice, @image);
+		INSERT INTO [stk_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice, @image);
+		INSERT INTO [stk_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
+		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice, @image);
 	END TRY 
 	BEGIN CATCH
 	SELECT
