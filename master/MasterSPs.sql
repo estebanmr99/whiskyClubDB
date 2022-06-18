@@ -564,4 +564,58 @@ END
 GO
 
 -- EXECUTE prcFindEmploBySotre @store = 1,@idEmployee= 1, @country = 'Ireland'
+--EXECUTE prcFindEmploBySotre @store = 9,@idEmployee= 12, @country = 'United States'
+
+CREATE PROCEDURE CRUD_product_type
+	@idType INT,
+    @name VARCHAR(50),
+	@action CHAR(1)
+AS
+  BEGIN TRY   -- statements that may cause exceptions
+
+	DECLARE @update VARCHAR(max),@delete VARCHAR(max)
+
+	SET @delete = (SELECT CONCAT('UPDATE product.product_type SET deleted = 1 ',
+					'WHERE idType=',
+					QUOTENAME(@idType,'()')));
+
+	SET @update = (SELECT CONCAT('UPDATE product.product_type SET name=',
+					QUOTENAME(@name,''''),
+					' WHERE idType=',
+					QUOTENAME(@idType,'()')));
+
+	IF @action = 'C'
+	BEGIN 
+
+	INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT name,deleted FROM product.product_type')   
+    VALUES(@name,0)
+		
+	END
+	IF @action = 'R'
+	BEGIN 
+
+	SELECT idType,name,deleted FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idType,name,deleted FROM product.product_type')  
+
+	END
+	IF @action='U'
+	BEGIN 
+		EXEC(@update)AT [UNIVERSAL-MYSQL] 
+	END
+	IF @action= 'D'
+	BEGIN
+		EXEC(@delete)AT [UNIVERSAL-MYSQL] 
+	END;
+	 
+END TRY  
+BEGIN CATCH  -- statements that handle exception
+			 SELECT  
+            ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH  
+
+
 
