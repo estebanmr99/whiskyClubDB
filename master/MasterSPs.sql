@@ -733,3 +733,56 @@ GO
 
 
 
+CREATE PROCEDURE prcCreateProduct
+@nameParam varchar(50),
+@typeParam int,
+@agedParam varchar(10),
+@presentationParam varchar(150),
+@imageParam nvarchar(MAX),
+@globalPriceParam money
+AS
+BEGIN
+	BEGIN TRY 
+	 
+	 DECLARE @maxIDProduct int;
+        SET @maxIDProduct = 0; 
+		SELECT @maxIDProduct = MAX(idProduct) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct FROM product.product')
+		SET @maxIDProduct = @maxIDProduct+1; 
+
+
+
+			BEGIN
+					
+					--insert product on the universal product database on MYSQL
+					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct,idType,name,features,image,createDate,updateDate,deleted FROM product.product')   
+					VALUES(@maxIDProduct,@typeParam,@nameParam,'{"Aged": "@agedParam", "Presentation": "@presentationParam"}',TO_BASE64(@imageParam),(SELECT GETDATE()),(SELECT GETDATE()),0)
+
+
+					--insert products on stores in the US
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+					--insert products on stores in STK
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+					--insert products on stores in IE
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+			END
+		
+			BEGIN
+				RAISERROR ('Product already exist.', 11, 1);
+			END
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+
+
