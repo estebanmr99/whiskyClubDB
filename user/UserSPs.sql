@@ -91,14 +91,16 @@ CREATE PROCEDURE prcCreateProduct
 @globalPrice money
 AS
 BEGIN
+		DECLARE @localPrice money
+		 set @localPrice = @globalPrice
 	BEGIN TRY 
 
-		INSERT INTO [dbo].[usa_store1].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
-		INSERT INTO [dbo].[usa_store2].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
-		INSERT INTO [dbo].[usa_store3].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [usa_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice);
+		INSERT INTO [usa_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice);
+		INSERT INTO [usa_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice);
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -113,39 +115,6 @@ BEGIN
 
 END
 GO
-
-
-
--- CREATE PRODUCT USER SCOTLAN
-CREATE PROCEDURE prcCreateProduct
-@idProduct int,
-@globalPrice money
-AS
-BEGIN
-	BEGIN TRY 
-
-		INSERT INTO [dbo].[stk_store1].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
-		INSERT INTO [dbo].[stk_store2].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
-		INSERT INTO [dbo].[stk_store3].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
-	END TRY 
-	BEGIN CATCH
-	SELECT
-	  ERROR_NUMBER() AS ErrorNumber  
-            ,ERROR_SEVERITY() AS ErrorSeverity  
-            ,ERROR_STATE() AS ErrorState  
-            ,ERROR_PROCEDURE() AS ErrorProcedure  
-            ,ERROR_LINE() AS ErrorLine  
-            ,ERROR_MESSAGE() AS ErrorMessage;
-
-	END CATCH
-
-END
-GO
-
-
 
 
 
@@ -155,14 +124,52 @@ CREATE PROCEDURE prcCreateProduct
 @globalPrice money
 AS
 BEGIN
+		DECLARE @localPrice money
+		 set @localPrice = (@globalPrice*0.96)
 	BEGIN TRY 
+		
 
-		INSERT INTO [dbo].[ie_store1].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
-		INSERT INTO [dbo].[ie_store2].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
-		INSERT INTO [dbo].[ie_store3].[product] (idProduct, globalPrice)
-		VALUES (@idProduct, @globalPrice);
+		INSERT INTO [ie_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice);
+		INSERT INTO [ie_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice);
+		INSERT INTO [ie_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'EUR',@localPrice ,@globalPrice);
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+
+
+-- CREATE PRODUCT USER SCOTLAND
+CREATE PROCEDURE prcCreateProduct
+@idProduct int,
+@globalPrice money
+AS
+BEGIN
+		DECLARE @localPrice money
+		 set @localPrice = (@globalPrice*0.82)
+	BEGIN TRY 
+		
+
+
+		INSERT INTO [stk_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice);
+		INSERT INTO [stk_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice);
+		INSERT INTO [stk_store3].[dbo].[product] (idProduct, currency, localPrice, globalPrice)
+		VALUES (@idProduct, 'GBP',@localPrice ,@globalPrice);
 	END TRY 
 	BEGIN CATCH
 	SELECT
