@@ -681,3 +681,55 @@ GO
 
 
 
+CREATE PROCEDURE prcDeleteEmploBySotre
+@store int,
+@idEmployee int,
+@country varchar(50)
+AS
+BEGIN
+	BEGIN TRY 
+			
+			DECLARE @select varchar(150),@update varchar(150),@sql varchar(300)
+		set @select = 'update OPENQUERY([UNIVERSAL-MYSQL],
+					''SELECT idEmployee,deleted FROM employee.employee where (idEmployee ='+ CAST(@idEmployee as nvarchar(30))+')'')'
+		set @update = 'set deleted = 1'
+
+		set @sql = @select + @update
+		EXEC(@sql)
+
+
+        
+            BEGIN
+					
+            IF @country = 'United States'
+
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcDeleteEmploBySotre] @store=@store, @idEmployee = @idEmployee;
+			ELSE IF @country = 'Scotland'
+
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcDeleteEmploBySotre] @store=@store, @idEmployee = @idEmployee;
+					
+			ELSE IF @country = 'Ireland'
+
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcDeleteEmploBySotre] @store=@store, @idEmployee = @idEmployee;
+					
+			ELSE
+					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
+            END
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+
+
