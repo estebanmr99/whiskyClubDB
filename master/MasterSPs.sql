@@ -914,5 +914,81 @@ BEGIN
 END
 GO
 
+CREATE PROCEDURE prcUpdateStoreInventory
+@searchQuery varchar(255),
+@idUserParam int,
+@idType int,
+@distance int,
+@price int,
+@order varchar(30),
+@country varchar(30)
+AS
+BEGIN
+	BEGIN TRY
 
+		DECLARE @storeProducts TABLE (idStore int, idProduct int, storeName varchar(50), storeLocation geography, productQuantity int, currency varchar(30), localPrice int, globalPrice int, distanceUser int, idType int, productName varchar(50), features varchar(8000), [image] varchar(MAX), sales int)
 
+		IF @country = 'United States'
+			INSERT INTO @storeProducts (idStore, idProduct, storeName, storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser)
+			EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcGetAllStoresInventory] @idUser = @idUserParam
+		ELSE IF @country = 'Scotland'
+			INSERT INTO @storeProducts (idStore, idProduct, storeName, storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser)
+			EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcGetAllStoresInventory] @idUser = @idUserParam
+		ELSE IF @country = 'Ireland'
+			INSERT INTO @storeProducts (idStore, idProduct, storeName, storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser)
+			EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcGetAllStoresInventory] @idUser = @idUserParam
+		ELSE
+			RAISERROR ( 'Whoops, an error occurred: Country not found', 11, 1);
+
+		DECLARE @products TABLE (idProduct int, idType int, productName varchar(50), features varchar(8000), [image] varchar(MAX), sales int)
+		INSERT INTO @products
+		EXEC ('CALL product.prcGetProductsWithSales()') at [UNIVERSAL-MYSQL];
+
+		UPDATE sp
+		SET sp.idType = p.idType, sp.productName = p.productName, sp.features = p.features, sp.image = p.image, sp.sales = p.sales
+		FROM @storeProducts as sp
+		INNER JOIN @products as p on sp.idProduct = p.idProduct
+
+		IF @order = 'Asc'
+			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
+			FROM @storeProducts
+			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
+					(idType = isnull(@idType, idType)) AND 
+					(distanceUser <= isnull(@distance, distanceUser)) --AND 
+					--(localPrice <= isnull(@price, localPrice))
+			ORDER BY productName ASC
+		ELSE IF @order = 'Desc'
+			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
+			FROM @storeProducts
+			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
+					(idType = isnull(@idType, idType)) AND 
+					(distanceUser <= isnull(@distance, distanceUser)) --AND 
+					--(localPrice <= isnull(@price, localPrice))
+			ORDER BY productName DESC
+		ELSE IF @order = 'Popular'
+			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
+			FROM @storeProducts
+			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
+					(idType = isnull(@idType, idType)) AND 
+					(distanceUser <= isnull(@distance, distanceUser)) --AND 
+					--(localPrice <= isnull(@price, localPrice))
+			ORDER BY sales DESC
+		ELSE
+			RAISERROR ( 'Whoops, an error occurred: Order not possible', 11, 1);
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+-- EXECUTE prcUpdateStoreInventory @searchQuery = '', @idUserParam = 0, @idType = null, @distance = null, @price = null, @order = 'Popular', @country = 'United States'

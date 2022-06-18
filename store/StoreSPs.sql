@@ -274,3 +274,138 @@ END
 GO
 
 -- EXECUTE prcUpdateStoreInventory
+
+-- IRELAND
+DROP PROCEDURE prcGetAllStoresInventory
+CREATE PROCEDURE prcGetAllStoresInventory
+@idUser int
+AS
+BEGIN
+	BEGIN TRY
+
+    DECLARE @userLocation geography;
+    SELECT @userLocation = location FROM [ie_user].[dbo].[user] WHERE idUser = @idUser;
+
+    select p.idStore, p.idProduct, p.storeName, p.storeLocation, p.productQuantity, p.currency, p.localPrice, p.globalPrice, (p.storeLocation.STDistance(@userLocation) / 1000) as distanceUser  from(		
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [ie_store1].[dbo].[product] as p
+            INNER JOIN [ie_store1].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [ie_store1].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0
+            UNION ALL
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [ie_store2].[dbo].[product] as p
+            INNER JOIN [ie_store2].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [ie_store2].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0
+            UNION ALL
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [ie_store3].[dbo].[product] as p
+            INNER JOIN [ie_store3].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [ie_store3].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0) as p
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+-- SCOTLAND
+DROP PROCEDURE prcGetAllStoresInventory
+CREATE PROCEDURE prcGetAllStoresInventory
+@idUser int
+AS
+BEGIN
+	BEGIN TRY
+
+    DECLARE @userLocation geography;
+    SELECT @userLocation = location FROM [stk_user].[dbo].[user] WHERE idUser = @idUser;
+
+    select p.idStore, p.idProduct, p.storeName, p.storeLocation, p.productQuantity, p.currency, p.localPrice, p.globalPrice, (p.storeLocation.STDistance(@userLocation) / 1000) as distanceUser  from(		
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [stk_store1].[dbo].[product] as p
+            INNER JOIN [stk_store1].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [stk_store1].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0
+            UNION ALL
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [stk_store2].[dbo].[product] as p
+            INNER JOIN [stk_store2].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [stk_store2].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0
+            UNION ALL
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [stk_store3].[dbo].[product] as p
+            INNER JOIN [stk_store3].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [stk_store3].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0) as p
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+-- UNITED STATES
+DROP PROCEDURE prcGetAllStoresInventory
+CREATE PROCEDURE prcGetAllStoresInventory
+@idUser int
+AS
+BEGIN
+	BEGIN TRY
+
+    DECLARE @userLocation geography;
+    SELECT @userLocation = location FROM [usa_user].[dbo].[user] WHERE idUser = @idUser;
+
+    select p.idStore, p.idProduct, p.storeName, p.storeLocation, p.productQuantity, p.currency, p.localPrice, p.globalPrice, (p.storeLocation.STDistance(@userLocation) / 1000) as distanceUser  from(		
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [usa_store1].[dbo].[product] as p
+            INNER JOIN [usa_store1].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [usa_store1].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0
+            UNION ALL
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [usa_store2].[dbo].[product] as p
+            INNER JOIN [usa_store2].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [usa_store2].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0
+            UNION ALL
+            SELECT (s.idStore) as idStore, p.idProduct, (s.name) as storeName, (s.location) as storeLocation, (i.quantity) as productQuantity, p.currency, p.localPrice, p.globalPrice
+            FROM [usa_store3].[dbo].[product] as p
+            INNER JOIN [usa_store3].[dbo].[inventory] as i on p.idProduct = i.idProduct
+            INNER JOIN [usa_store3].[dbo].[store] as s on i.idStore = s.idStore
+            WHERE p.deleted = 0) as p
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
