@@ -1,5 +1,9 @@
+-- Product database schema
+-- Makes use of the MySQL database system
+
 CREATE DATABASE product;
 
+-- Set the database to use and the start id of the coloumns 
 USE product;
 SET sql_mode='NO_AUTO_VALUE_ON_ZERO';
 

@@ -1,100 +1,24 @@
--- ireland
+-- User database schema
+-- Makes use of the SQL server database system
+-- A instance need to be created for each country
 
-CREATE DATABASE ie_user;
+-------------------------------------------------------------- ireland --------------------------------------------------------------
 
-USE ie_user;
+-- CREATE DATABASE ie_user;
 
-CREATE TABLE user_type (
-    idUserType int identity,
-    name varchar(50),
-    deleted bit,
-    PRIMARY KEY (idUserType)
-);
+-- USE ie_user;
 
-CREATE TABLE level (
-    idLevel int identity,
-    description varchar(MAX),
-    discProduct int,
-    discShipping int,
-    deleted bit,
-    PRIMARY KEY (idLevel)
-);
+-------------------------------------------------------------- scotland --------------------------------------------------------------
 
-CREATE TABLE [user] (
-    idUser int,
-    idUserType int,
-    idLevel int,
-    email varchar(50),
-    password varchar(255),
-    name varchar(50),
-    lastName varchar(50),
-    telephone varchar(30),
-    location geography,
-    createDate datetime,
-    updateDate datetime,
-    deleted bit,
-    PRIMARY KEY (idUser),
+-- CREATE DATABASE stk_user;
 
-    CONSTRAINT FK_UserIdUserType
-    FOREIGN KEY (idUserType)
-    REFERENCES user_type(idUserType),
+-- USE stk_user;
 
-    CONSTRAINT FK_UserIdLevel
-    FOREIGN KEY (idLevel)
-    REFERENCES level(idLevel)
-);
+-------------------------------------------------------------- united states --------------------------------------------------------------
 
------- scotland
+-- CREATE DATABASE usa_user;
 
-CREATE DATABASE stk_user;
-
-USE stk_user;
-
-CREATE TABLE user_type (
-    idUserType int identity,
-    name varchar(50),
-    deleted bit,
-    PRIMARY KEY (idUserType)
-);
-
-CREATE TABLE level (
-    idLevel int identity,
-    description varchar(MAX),
-    discProduct int,
-    discShipping int,
-    deleted bit,
-    PRIMARY KEY (idLevel)
-);
-
-CREATE TABLE [user] (
-    idUser int,
-    idUserType int,
-    idLevel int,
-    email varchar(50),
-    password varchar(255),
-    name varchar(50),
-    lastName varchar(50),
-    telephone varchar(30),
-    location geography,
-    createDate datetime,
-    updateDate datetime,
-    deleted bit,
-    PRIMARY KEY (idUser),
-
-    CONSTRAINT FK_UserIdUserType
-    FOREIGN KEY (idUserType)
-    REFERENCES user_type(idUserType),
-
-    CONSTRAINT FK_UserIdLevel
-    FOREIGN KEY (idLevel)
-    REFERENCES level(idLevel)
-);
-
------- USA
-
-CREATE DATABASE usa_user;
-
-USE usa_user;
+-- USE usa_user;
 
 CREATE TABLE user_type (
     idUserType int identity,

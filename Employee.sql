@@ -1,3 +1,6 @@
+-- Employee database schema
+-- Makes use of the MySQL database system
+
 CREATE DATABASE employee;
 
 USE employee;

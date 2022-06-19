@@ -1,3 +1,7 @@
+-- Store database schema
+-- Makes use of the SQL server database system
+-- A 3 databses need to be created for each country
+
 -------------------------------------------------------------- ireland --------------------------------------------------------------
 
 -- CREATE DATABASE ie_store1;

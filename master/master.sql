@@ -1,3 +1,6 @@
+-- Master database schema (it the local database)
+-- Makes use of the SQL server database system
+
 CREATE DATABASE masterdb;
 
 CREATE TABLE tempNextUserId (maxIDuser INT);

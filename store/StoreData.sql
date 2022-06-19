@@ -1,3 +1,5 @@
+-- Data to insert into the store database of each country instance
+
 -------------------------------------------------------------------------------------------------------------------------------- Ireland
 ------------------------------------------------------------------------- store 1
 INSERT INTO [ie_store1].[dbo].[store]
@@ -6,9 +8,11 @@ VALUES (0, 'Cork', geography::Point(51.89545714714142, -8.468307839127354, 4326)
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [ie_store1].[dbo].[product]
 VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 40, 42, 0),
 	   (1, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 100, 105, 0),
@@ -17,6 +21,7 @@ VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [ie_store1].[dbo].[inventory]
 VALUES (0, 0, 1),
 		(1, 0, 3);
@@ -30,9 +35,11 @@ VALUES (1, 'Galway', geography::Point(53.275558513354085, -9.050912910850219, 43
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [ie_store2].[dbo].[product]
 VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 40, 42, 0),
 	   (1, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 100, 105, 0),
@@ -41,6 +48,7 @@ VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [ie_store2].[dbo].[inventory]
 VALUES (0, 1, 0),
 		(1, 1, 10);
@@ -54,9 +62,11 @@ VALUES (2, 'Dublin', geography::Point(53.33330031045176, -6.269274948248049, 432
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [ie_store3].[dbo].[product]
 VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 40, 42, 0),
 	   (1, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 100, 105, 0),
@@ -65,6 +75,7 @@ VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [ie_store3].[dbo].[inventory]
 VALUES (0, 2, 4),
 		(1, 2, 5);
@@ -79,9 +90,11 @@ VALUES (3, 'Inverness', geography::Point(57.47412984398131, -4.239453384881591, 
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [stk_store1].[dbo].[product]
 VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 40, 42, 0),
 	   (1, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 100, 105, 0),
@@ -90,6 +103,7 @@ VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [stk_store1].[dbo].[inventory]
 VALUES (0, 3, 0),
 		(1, 3, 0);
@@ -103,9 +117,11 @@ VALUES (4, 'Glasgow', geography::Point(55.86803289296835, -4.265528127997926, 43
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [stk_store2].[dbo].[product]
 VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 40, 42, 0),
 	   (1, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 100, 105, 0),
@@ -114,6 +130,7 @@ VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [stk_store2].[dbo].[inventory]
 VALUES (0, 4, 1),
 		(1, 4, 3);
@@ -127,9 +144,11 @@ VALUES (5, 'Edinburgh', geography::Point(55.93519013197581, -3.219917253393694, 
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [stk_store3].[dbo].[product]
 VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 40, 42, 0),
 	   (1, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 100, 105, 0),
@@ -138,6 +157,7 @@ VALUES (0, 'Euro', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [stk_store3].[dbo].[inventory]
 VALUES (0, 5, 15),
 		(1, 5, 1);
@@ -152,9 +172,11 @@ VALUES (6, 'Washington', geography::Point(38.860582807021636, -77.09366705792416
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [usa_store1].[dbo].[product]
 VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 42, 42, 0),
 	   (1, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 105, 105, 0),
@@ -163,6 +185,7 @@ VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str")
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [usa_store1].[dbo].[inventory]
 VALUES (0, 6, 0),
 		(1, 6, 5);
@@ -176,9 +199,11 @@ VALUES (7, 'Los Angeles', geography::Point(34.03742229442408, -118.2025792752806
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [usa_store2].[dbo].[product]
 VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 42, 42, 0),
 	   (1, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 105, 105, 0),
@@ -187,6 +212,7 @@ VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str")
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [usa_store2].[dbo].[inventory]
 VALUES (0, 7, 7),
 		(1, 7, 3);
@@ -200,9 +226,11 @@ VALUES (8, 'Dallas', geography::Point(32.73279226789102, -96.69918800417629, 432
 DELETE inventory;
 DELETE product;
 
+-- Image to insert for each product
 DECLARE @str varchar(max);
 SET @str = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+-- Insert products created in the store (needs to be already inserted in the Product database)
 INSERT INTO [usa_store3].[dbo].[product]
 VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 42, 42, 0),
 	   (1, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), 105, 105, 0),
@@ -211,6 +239,7 @@ VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str")
        (4, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0),
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
+-- Insert inventory of the store
 INSERT INTO [usa_store3].[dbo].[inventory]
 VALUES (0, 8, 2),
 		(1, 8, 9);
