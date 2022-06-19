@@ -999,3 +999,75 @@ END
 GO
 
 -- EXECUTE prcUpdateStoreInventory @searchQuery = '', @idUserParam = 0, @idType = null, @distance = null, @price = null, @order = 'Popular', @country = 'United States'
+
+
+
+
+CREATE PROCEDURE prcCreateProduct
+@nameParam varchar(50),
+@typeParam int,
+@agedParam varchar(10),
+@presentationParam varchar(150),
+@imageParam varbinary(MAX),
+@globalPriceParam money
+AS
+BEGIN
+	BEGIN TRY 
+	 
+	 DECLARE @maxIDProduct int;
+        SET @maxIDProduct = 0; 
+		SELECT @maxIDProduct = MAX(idProduct) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct FROM product.product')
+		SET @maxIDProduct = @maxIDProduct+1; 
+
+
+
+			BEGIN
+					
+					--insert product on the universal product database on MYSQL
+					DECLARE 
+							@values VARCHAR(max),
+							@insert VARCHAR(max),
+							@json nvarchar(max)=N'[{"Aged": '+'"'+@agedParam+'"'+', "Presentation": '+'"'+@presentationParam+'"'+'}]';
+
+								SET @insert = 'INSERT INTO product.product (idProduct, idType,name, features, image,createDate,updateDate,deleted) '
+
+								SET @values = (SELECT CONCAT('VALUES(',
+												QUOTENAME(@maxIDProduct,'()'),',',
+												QUOTENAME(@typeParam,'()'),',',
+												QUOTENAME(@nameParam,''''),',',
+												QUOTENAME(@json,''''),',',
+												'TO_BASE64(',QUOTENAME(@imageParam,''''),')',',',
+												'NOW()',',','NOW()',',','0',')'
+												));
+
+							declare @query varchar(max)
+							set @query=@insert+@values
+							--print @query
+
+							EXEC(@query)AT [UNIVERSAL-MYSQL]
+
+					--insert products on stores in the US
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+					--insert products on stores in STK
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+					--insert products on stores in IE
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+			END
+		
+			BEGIN
+				RAISERROR ('Product already exist.', 11, 1);
+			END
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
