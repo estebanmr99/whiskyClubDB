@@ -1008,7 +1008,7 @@ CREATE PROCEDURE prcCreateProduct
 @typeParam int,
 @agedParam varchar(10),
 @presentationParam varchar(150),
-@imageParam VARBINARY(MAX),
+@imageParam varchar(MAX),
 @globalPriceParam money
 AS
 BEGIN
@@ -1036,7 +1036,7 @@ BEGIN
 										QUOTENAME(@typeParam,'()'),',',
 										QUOTENAME(@nameParam,''''),',',
 										QUOTENAME(@json,''''),',',
-										'TO_BASE64(',QUOTENAME(@imageParam,''''),')',',',
+										'FROM_BASE64(',QUOTENAME(@imageParam,''''),')',',',
 										'NOW()',',','NOW()',',','0',')'
 										));
 
@@ -1046,11 +1046,11 @@ BEGIN
 					EXEC(@query)AT [UNIVERSAL-MYSQL]
 
 					--insert products on stores in the US
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
 					--insert products on stores in STK
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
 					--insert products on stores in IE
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
 			END
 		
 			BEGIN
@@ -1093,9 +1093,21 @@ AS
 
 	 
 END TRY  
-BEGIN CATCH  -- statements that handle exception
-			 SELECT  
-            ERROR_NUMBER() AS ErrorNumber  
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+
 CREATE PROCEDURE prcGetProductsType
 AS
 BEGIN
