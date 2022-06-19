@@ -89,7 +89,7 @@ GO
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
 @globalPrice money,
-@image nvarchar(max)
+@image varbinary(max)
 AS
 BEGIN
 		DECLARE @localPrice money
@@ -123,7 +123,7 @@ GO
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
 @globalPrice money,
-@image nvarchar(max)
+@image varbinary(max)
 AS
 BEGIN
 		DECLARE @localPrice money
@@ -158,7 +158,7 @@ GO
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
 @globalPrice money,
-@image nvarchar(max)
+@image varbinary(max)
 AS
 BEGIN
 		DECLARE @localPrice money
