@@ -1,3 +1,6 @@
+-- Mater database stored procedures
+-- The procedures all run in the local machine.
+
 CREATE PROCEDURE prcFindUserByEmail
 @emailParam varchar(50),
 @select bit = 1
@@ -250,11 +253,11 @@ BEGIN
 
 
 					--insert products on stores in the US
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProductUS]  @maxIDProduct = @idProduct;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @maxIDProduct = @idProduct;
 					--insert products on stores in STK
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProductSTK]  @maxIDProduct = @idProduct;
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @maxIDProduct = @idProduct;
 					--insert products on stores in IE
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProductIE]  @maxIDProduct = @idProduct;
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @maxIDProduct = @idProduct;
 	
 				ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
@@ -361,7 +364,6 @@ END
 GO
 
 -- EXECUTE prcGetStoresInfo
--- DROP PROCEDURE prcGetStoresInfo
 
 CREATE PROCEDURE prcGetProductsInfo
 AS
@@ -394,7 +396,6 @@ END
 GO
 
 -- EXECUTE prcGetProductsInfo
--- DROP PROCEDURE prcGetProductsInfo
 
 CREATE PROCEDURE prcGetStoresInventory
 AS
@@ -410,7 +411,7 @@ BEGIN
 		 idStore int
 		);
 
-				-- Ireland stores info
+		-- Ireland stores info
 		INSERT INTO @storesInventory
 		EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcGetStoresInventory]
 
@@ -498,7 +499,7 @@ GO
 
 -- EXECUTE prcUpdateStoreInventory
 
-CREATE PROCEDURE prcFindEmploBySotre
+CREATE PROCEDURE prcFindEmployeeByStore
 @store int,
 @idEmployee int,
 @country varchar(50)
@@ -530,13 +531,13 @@ BEGIN
 			BEGIN
 				IF @country = 'United States'
 					insert into @storesEmployees
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindEmploBySotre] @store = @store, @idEmployee = @idEmployee;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindEmployeeByStore] @store = @store, @idEmployee = @idEmployee;
 				ELSE IF @country = 'Scotland'
 					insert into @storesEmployees
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindEmploBySotre]@store = @store, @idEmployee =@idEmployee ;
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindEmployeeByStore]@store = @store, @idEmployee =@idEmployee ;
 				ELSE IF @country = 'Ireland'
 					insert into @storesEmployees
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindEmploBySotre]@store = @store , @idEmployee = @idEmployee;
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindEmployeeByStore]@store = @store , @idEmployee = @idEmployee;
 				ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
@@ -563,12 +564,11 @@ BEGIN
 END
 GO
 
--- EXECUTE prcFindEmploBySotre @store = 1,@idEmployee= 1, @country = 'Ireland'
---EXECUTE prcFindEmploBySotre @store = 9,@idEmployee= 12, @country = 'United States'
+-- EXECUTE prcFindEmployeeByStore @store = 1,@idEmployee= 1, @country = 'Ireland'
+--EXECUTE prcFindEmployeeByStore @store = 9,@idEmployee= 12, @country = 'United States'
 
 
-
-CREATE PROCEDURE prcFindEmployeesBySotre
+CREATE PROCEDURE prcFindEmployeesByStore
 @store int,
 @country varchar(50)
 AS
@@ -601,13 +601,13 @@ BEGIN
 			BEGIN
 				IF @country = 'United States'
 					insert into @storesEmployees
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindEmployeesBySotre] @store = @store;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindEmployeesByStore] @store = @store;
 				ELSE IF @country = 'Scotland'
 					insert into @storesEmployees
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindEmployeesBySotre]@store = @store;
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindEmployeesByStore]@store = @store;
 				ELSE IF @country = 'Ireland'
 					insert into @storesEmployees
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindEmployeesBySotre]@store = @store ;
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindEmployeesByStore]@store = @store ;
 				ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
@@ -637,9 +637,6 @@ BEGIN
 
 END
 GO
-
-
-
 
 
 CREATE PROCEDURE CRUD_product_type
@@ -699,8 +696,7 @@ END CATCH
 
 -- EXECUTE CRUD_product_type @action = 'R'
 
---
-CREATE PROCEDURE prcUpdateEmploBySotre
+CREATE PROCEDURE prcUpdateEmployeeByStore
 @store int,
 @idEmployee int,
 @name varchar(50),
@@ -725,11 +721,11 @@ BEGIN
 
         BEGIN
             IF @country = 'United States'
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcUpdateEmploBySotre] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcUpdateEmployeeByStore] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
 				ELSE IF @country = 'Scotland'
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcUpdateEmploBySotre] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcUpdateEmployeeByStore] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
 				ELSE IF @country = 'Ireland'
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcUpdateEmploBySotre] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary;
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcUpdateEmployeeByStore] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary;
 				ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
             END
@@ -750,7 +746,7 @@ END
 GO
 
 
---EXEC prcUpdateEmploBySotre
+--EXEC prcUpdateEmployeeByStore
 --@store =7,
 --@idEmployee =10,
 --@name ='froilan',
@@ -763,7 +759,7 @@ GO
 
 --select * from [UNITEDSTATESSQL].[usa_store1].[dbo].[employee]
 
-CREATE PROCEDURE prcInsertEmploBySotre
+CREATE PROCEDURE prcInsertEmployeeByStore
 @store int,
 @name varchar(50),
 @lastName varchar(50),
@@ -784,15 +780,15 @@ BEGIN
 					VALUES(@maxIDuser,@name,@lastName,@birthDate,(SELECT GETDATE()),(SELECT GETDATE()),0)
             IF @country = 'United States'
 
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcInsertEmploBySotre] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcInsertEmployeeByStore] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
 				
 			ELSE IF @country = 'Scotland'
 
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcInsertEmploBySotre] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcInsertEmployeeByStore] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
 					
 			ELSE IF @country = 'Ireland'
 
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcInsertEmploBySotre] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary;
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcInsertEmployeeByStore] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary;
 					
 			ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
@@ -815,7 +811,7 @@ GO
 
 
 
-CREATE PROCEDURE prcDeleteEmploBySotre
+CREATE PROCEDURE prcDeleteEmployeeByStore
 @store int,
 @idEmployee int,
 @country varchar(50)
@@ -823,7 +819,7 @@ AS
 BEGIN
 	BEGIN TRY 
 			
-			DECLARE @select varchar(150),@update varchar(150),@sql varchar(300)
+		DECLARE @select varchar(150),@update varchar(150),@sql varchar(300)
 		set @select = 'update OPENQUERY([UNIVERSAL-MYSQL],
 					''SELECT idEmployee,deleted FROM employee.employee where (idEmployee ='+ CAST(@idEmployee as nvarchar(30))+')'')'
 		set @update = 'set deleted = 1'
@@ -831,20 +827,18 @@ BEGIN
 		set @sql = @select + @update
 		EXEC(@sql)
 
-
-        
             BEGIN
 					
             IF @country = 'United States'
 
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcDeleteEmploBySotre] @Store=@store, @IdEmployee = @idEmployee;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcDeleteEmployeeByStore] @Store=@store, @IdEmployee = @idEmployee;
 			ELSE IF @country = 'Scotland'
 
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcDeleteEmploBySotre] @store=@store, @idEmployee = @idEmployee;
+					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcDeleteEmployeeByStore] @store=@store, @idEmployee = @idEmployee;
 					
 			ELSE IF @country = 'Ireland'
 
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcDeleteEmploBySotre] @store=@store, @idEmployee = @idEmployee;
+					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcDeleteEmployeeByStore] @store=@store, @idEmployee = @idEmployee;
 					
 			ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
@@ -864,7 +858,6 @@ BEGIN
 
 END
 GO
-
 
 
 CREATE PROCEDURE prcCreateProduct
@@ -883,21 +876,18 @@ BEGIN
 		SELECT @maxIDProduct = MAX(idProduct) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct FROM product.product')
 		SET @maxIDProduct = @maxIDProduct+1; 
 
-
-
 			BEGIN
-					
-					--insert product on the universal product database on MYSQL
-					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct,idType,name,features,image,createDate,updateDate,deleted FROM product.product')   
-					VALUES(@maxIDProduct,@typeParam,@nameParam,'{"Aged": "@agedParam", "Presentation": "@presentationParam"}',TO_BASE64(@imageParam),(SELECT GETDATE()),(SELECT GETDATE()),0)
+				--insert product on the universal product database on MYSQL
+				INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct,idType,name,features,image,createDate,updateDate,deleted FROM product.product')   
+				VALUES(@maxIDProduct,@typeParam,@nameParam,'{"Aged": "@agedParam", "Presentation": "@presentationParam"}',TO_BASE64(@imageParam),(SELECT GETDATE()),(SELECT GETDATE()),0)
 
 
-					--insert products on stores in the US
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
-					--insert products on stores in STK
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
-					--insert products on stores in IE
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+				--insert products on stores in the US
+				EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+				--insert products on stores in STK
+				EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
+				--insert products on stores in IE
+				EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
 			END
 		
 			BEGIN
@@ -1001,8 +991,6 @@ GO
 -- EXECUTE prcUpdateStoreInventory @searchQuery = '', @idUserParam = 0, @idType = null, @distance = null, @price = null, @order = 'Popular', @country = 'United States'
 
 
-
-
 CREATE PROCEDURE prcCreateProduct
 @nameParam varchar(50),
 @typeParam int,
@@ -1019,38 +1007,35 @@ BEGIN
 		SELECT @maxIDProduct = MAX(idProduct) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct FROM product.product')
 		SET @maxIDProduct = @maxIDProduct+1; 
 
-
-
 			BEGIN
-					
-					--insert product on the universal product database on MYSQL
-					DECLARE 
-					@values VARCHAR(max),
-					@insert VARCHAR(max),
-					@json nvarchar(max)=N'{"Aged": '+'"'+@agedParam+'"'+', "Presentation": '+'"'+@presentationParam+'"'+'}';
+				--insert product on the universal product database on MYSQL
+				DECLARE 
+				@values VARCHAR(max),
+				@insert VARCHAR(max),
+				@json nvarchar(max)=N'{"Aged": '+'"'+@agedParam+'"'+', "Presentation": '+'"'+@presentationParam+'"'+'}';
 
-						SET @insert = 'INSERT INTO product.product (idProduct, idType,name, features, image,createDate,updateDate,deleted) '
+					SET @insert = 'INSERT INTO product.product (idProduct, idType,name, features, image,createDate,updateDate,deleted) '
 
-						SET @values = (SELECT CONCAT('VALUES(',
-										QUOTENAME(@maxIDProduct,'()'),',',
-										QUOTENAME(@typeParam,'()'),',',
-										QUOTENAME(@nameParam,''''),',',
-										QUOTENAME(@json,''''),',',
-										'FROM_BASE64(',QUOTENAME(@imageParam,''''),')',',',
-										'NOW()',',','NOW()',',','0',')'
-										));
+					SET @values = (SELECT CONCAT('VALUES(',
+									QUOTENAME(@maxIDProduct,'()'),',',
+									QUOTENAME(@typeParam,'()'),',',
+									QUOTENAME(@nameParam,''''),',',
+									QUOTENAME(@json,''''),',',
+									'FROM_BASE64(',QUOTENAME(@imageParam,''''),')',',',
+									'NOW()',',','NOW()',',','0',')'
+									));
 
-					declare @query varchar(max)
-					set @query=@insert+@values
+				declare @query varchar(max)
+				set @query=@insert+@values
 
-					EXEC(@query)AT [UNIVERSAL-MYSQL]
+				EXEC(@query)AT [UNIVERSAL-MYSQL]
 
-					--insert products on stores in the US
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
-					--insert products on stores in STK
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
-					--insert products on stores in IE
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
+				--insert products on stores in the US
+				EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
+				--insert products on stores in STK
+				EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
+				--insert products on stores in IE
+				EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = NULL;
 			END
 		
 			BEGIN
@@ -1071,7 +1056,6 @@ BEGIN
 
 END
 GO
-
 
 
 CREATE PROCEDURE employeeReport
@@ -1106,41 +1090,6 @@ END TRY
 
 END
 GO
-
-
-CREATE PROCEDURE prcGetProductsType
-AS
-BEGIN
-	BEGIN TRY
-		DECLARE @productsInfo TABLE
-		(idType int, 
-		 name varchar(50)
-		);
-
-		INSERT INTO @productsInfo
-		SELECT * FROM OPENQUERY ([UNIVERSAL-MYSQL] , 'SELECT idType, name FROM product.product_type')
-
-		IF EXISTS (SELECT idType, name FROM @productsInfo)
-			SELECT (SELECT idType, name FROM @productsInfo FOR JSON AUTO) AS productsType
-
-	END TRY 
-	BEGIN CATCH
-	SELECT
-	  ERROR_NUMBER() AS ErrorNumber  
-            ,ERROR_SEVERITY() AS ErrorSeverity  
-            ,ERROR_STATE() AS ErrorState  
-            ,ERROR_PROCEDURE() AS ErrorProcedure  
-            ,ERROR_LINE() AS ErrorLine  
-            ,ERROR_MESSAGE() AS ErrorMessage;
-END CATCH
-
-	END CATCH
-
-END
-GO
-
-
-exec prcGetProductsType
 
 
 CREATE PROCEDURE prcGetOrdersById
@@ -1259,11 +1208,6 @@ GO
 --exec prcResolutionProductReviews
 --@idReview= 1,
 --@idUser = 1
-
-
-
-
-
 
 
 -- stored procedure for storing employee reviews

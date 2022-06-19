@@ -1,3 +1,5 @@
+-- Product database stored procedures
+
 -- PRODUCT
 DELIMITER //
 CREATE PROCEDURE prcGetProductsWithSales()
