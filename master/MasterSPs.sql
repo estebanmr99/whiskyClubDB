@@ -1096,9 +1096,36 @@ END TRY
 BEGIN CATCH  -- statements that handle exception
 			 SELECT  
             ERROR_NUMBER() AS ErrorNumber  
+CREATE PROCEDURE prcGetProductsType
+AS
+BEGIN
+	BEGIN TRY
+		DECLARE @productsInfo TABLE
+		(idType int, 
+		 name varchar(50)
+		);
+
+		INSERT INTO @productsInfo
+		SELECT * FROM OPENQUERY ([UNIVERSAL-MYSQL] , 'SELECT idType, name FROM product.product_type')
+
+		IF EXISTS (SELECT idType, name FROM @productsInfo)
+			SELECT (SELECT idType, name FROM @productsInfo FOR JSON AUTO) AS productsType
+
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
             ,ERROR_SEVERITY() AS ErrorSeverity  
             ,ERROR_STATE() AS ErrorState  
             ,ERROR_PROCEDURE() AS ErrorProcedure  
             ,ERROR_LINE() AS ErrorLine  
             ,ERROR_MESSAGE() AS ErrorMessage;
 END CATCH
+
+	END CATCH
+
+END
+GO
+
+
+exec prcGetProductsType
