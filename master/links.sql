@@ -31,9 +31,3 @@ EXEC master.dbo.sp_addlinkedserver @server = N'UNIVERSAL-MYSQL', @srvproduct=N'P
 EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname=N'UNIVERSAL-MYSQL',@useself=N'False',@locallogin=NULL,@rmtuser=N'root',@rmtpassword='Wisky@Rules2022!';
 EXEC master.dbo.sp_serveroption @server=N'UNIVERSAL-MYSQL', @optname=N'rpc', @optvalue=N'true';
 EXEC master.dbo.sp_serveroption @server=N'UNIVERSAL-MYSQL', @optname=N'rpc out', @optvalue=N'true';
-
--- select * from [IRELANDSQL].[ie_store1].[dbo].[employee]
--- select * from openquery([IRELANDSQL], 'select * from [ie_store1].[dbo].[store]') --para columnas con ubicacion
--- EXEC ('SELECT * FROM employee.department') AT [UNIVERSAL-MYSQL] 
---select * from OPENQUERY([UNIVERSAL-MYSQL], 'SELECT * FROM employee.employee')
--- EXEC ('SELECT * FROM product.product') AT [UNIVERSAL-MYSQL] 
