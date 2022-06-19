@@ -164,8 +164,8 @@ VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str")
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
 INSERT INTO [usa_store1].[dbo].[inventory]
-VALUES (0, 6, 15),
-		(1, 6, 1);
+VALUES (0, 6, 0),
+		(1, 6, 5);
 
 select * from product;
 
@@ -188,8 +188,8 @@ VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str")
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
 INSERT INTO [usa_store2].[dbo].[inventory]
-VALUES (0, 7, 15),
-		(1, 7, 1);
+VALUES (0, 7, 7),
+		(1, 7, 3);
 
 select * from product;
 
@@ -212,7 +212,7 @@ VALUES (0, 'Dolar', cast(N'' as xml).value('xs:base64Binary(sql:variable("@str")
        (5, null, cast(N'' as xml).value('xs:base64Binary(sql:variable("@str"))', 'varbinary(max)'), null, null, 0);
 
 INSERT INTO [usa_store3].[dbo].[inventory]
-VALUES (0, 8, 15),
-		(1, 8, 1);
+VALUES (0, 8, 2),
+		(1, 8, 9);
 
 select * from product;
