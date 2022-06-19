@@ -1160,3 +1160,180 @@ BEGIN
 
 END
 GO
+
+
+-- stored procedure for storing product reviews
+
+CREATE PROCEDURE prcstoreProductReviews
+@idProduct int,
+@idUser int,
+@calification int,
+@review varchar(1500)
+AS
+BEGIN
+	BEGIN TRY
+	-- get the last idReview for the new insert
+		 DECLARE @maxIdReview int;
+        SET @maxIdReview = 0; 
+		SELECT @maxIdReview = MAX(idReview) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idReview FROM product.review')
+		SET @maxIdReview = @maxIdReview+1; 
+        
+			BEGIN
+			--insert review to MYSQL product.review database
+					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idReview,idProduct,idUser,calification,review,createDate,updateDate, deleted FROM product.review')   
+					VALUES(@maxIdReview,@idProduct,@idUser,@calification,@review,(SELECT GETDATE()),(SELECT GETDATE()),0)
+
+            END
+			-- print success if the procedure is done completely
+		SELECT 'Succes'
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+--exec prcstoreProductReviews
+--@idProduct= 1,
+--@idUser = 1,
+--@calification =4,
+--@review = 'Greate product and excellent delivery'
+
+
+
+-- stored procedure for responding to product reviews
+CREATE PROCEDURE prcResolutionProductReviews
+@idReview int,
+@idUser int
+AS
+BEGIN
+	BEGIN TRY
+	-- get the last idResolution for the new insert
+		DECLARE @resolution varchar(1500)
+		SET  @resolution = 'Thank you for your feedback. We look forward to hearing from you in due time regarding our submission and to respond to
+								any further questions and comments you may have. Sincerely, The Wisky Club'
+	
+        
+			BEGIN
+			--insert review to MYSQL product.resolution database
+					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idReview,idUser,resolution,createDate,updateDate, deleted FROM product.resolution')   
+					VALUES(@idReview,@idUser,@resolution,(SELECT GETDATE()),(SELECT GETDATE()),0)
+            END
+			-- print success if the procedure is done completely
+		SELECT 'Succes'
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+--exec prcResolutionProductReviews
+--@idReview= 1,
+--@idUser = 1
+
+
+
+
+
+
+
+-- stored procedure for storing employee reviews
+CREATE PROCEDURE prcstoreEmployeeReviews
+@idEmployee int,
+@idUser int,
+@calification int,
+@review varchar(1500)
+AS
+BEGIN
+	BEGIN TRY
+	-- get the last idReview for the new insert
+		 DECLARE @maxIdReview int;
+        SET @maxIdReview = 0; 
+		SELECT @maxIdReview = MAX(idReview) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idReview FROM employee.review')
+		SET @maxIdReview = @maxIdReview+1; 
+        
+			BEGIN
+			-- insert review to MYSQL employee.review database
+					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idReview,idEmployee,idUser,calification,review,createDate,updateDate, deleted FROM employee.review')   
+					VALUES(@maxIdReview,@idEmployee,@idUser,@calification,@review,(SELECT GETDATE()),(SELECT GETDATE()),0)
+
+            END
+			-- print success if the procedure is done completely
+		SELECT 'Success'
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+--exec prcstoreEmployeeReviews
+--@idEmployee= 1,
+--@idUser = 1,
+--@calification =1,
+--@review = 'Rude employee'
+
+
+-- stored procedure for responding to employee reviews
+CREATE PROCEDURE prcResolutionEmployeeReviews
+@idReview int,
+@idUser int
+AS
+BEGIN
+	BEGIN TRY
+	-- get the last idResolution for the new insert
+		DECLARE @resolution varchar(1500)
+		SET  @resolution = 'Thank you for your feedback. We look forward to hearing from you in due time regarding our submission and to respond to
+								any further questions and comments you may have. Sincerely, The Wisky Club'
+	
+        
+			BEGIN
+			--insert review to MYSQL product.resolution database
+					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idReview,idUser,resolution,createDate,updateDate, deleted FROM employee.resolution')   
+					VALUES(@idReview,@idUser,@resolution,(SELECT GETDATE()),(SELECT GETDATE()),0)
+            END
+			-- print success if the procedure is done completely
+		SELECT 'Succes'
+	END TRY 
+	BEGIN CATCH
+	SELECT
+	  ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+
+	END CATCH
+
+END
+GO
+
+--exec prcResolutionEmployeeReviews
+--@idReview= 1,
+--@idUser = 1
