@@ -617,7 +617,7 @@ BEGIN
 			select(
 			select Eh.idEmployee, Ep.name, Ep.lastName, Ep.birthDate,Eh.localSalary,Eh.globalSalary from @storesEmployeesMYSQL Ep
             inner join (select * from @storesEmployees ) Eh on Eh.idEmployee = Ep.idEmployee
-            where Eh.deleted = 0
+            where Ep.deleted = 0
             FOR JSON AUTO
             )as employees
 
@@ -721,7 +721,7 @@ BEGIN
 					   ', updateDate = '+QUOTENAME((SELECT CONVERT(varchar, getdate(), 23)),'''')
 
 		set @sql = @select + @update
-
+		exec(@sql);
 
         BEGIN
             IF @country = 'United States'
@@ -733,6 +733,7 @@ BEGIN
 				ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
             END
+		SELECT 'SUCCES'
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -796,6 +797,7 @@ BEGIN
 			ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
             END
+		SELECT 'Succes'
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -835,7 +837,7 @@ BEGIN
 					
             IF @country = 'United States'
 
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcDeleteEmploBySotre] @store=@store, @idEmployee = @idEmployee;
+					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcDeleteEmploBySotre] @Store=@store, @IdEmployee = @idEmployee;
 			ELSE IF @country = 'Scotland'
 
 					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcDeleteEmploBySotre] @store=@store, @idEmployee = @idEmployee;
@@ -847,7 +849,7 @@ BEGIN
 			ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
             END
-
+		SELECT 'Succes'
 	END TRY 
 	BEGIN CATCH
 	SELECT
