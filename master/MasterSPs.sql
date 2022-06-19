@@ -1008,7 +1008,7 @@ CREATE PROCEDURE prcCreateProduct
 @typeParam int,
 @agedParam varchar(10),
 @presentationParam varchar(150),
-@imageParam varbinary(MAX),
+@imageParam VARBINARY(MAX),
 @globalPriceParam money
 AS
 BEGIN
@@ -1025,26 +1025,25 @@ BEGIN
 					
 					--insert product on the universal product database on MYSQL
 					DECLARE 
-							@values VARCHAR(max),
-							@insert VARCHAR(max),
-							@json nvarchar(max)=N'[{"Aged": '+'"'+@agedParam+'"'+', "Presentation": '+'"'+@presentationParam+'"'+'}]';
+					@values VARCHAR(max),
+					@insert VARCHAR(max),
+					@json nvarchar(max)=N'{"Aged": '+'"'+@agedParam+'"'+', "Presentation": '+'"'+@presentationParam+'"'+'}';
 
-								SET @insert = 'INSERT INTO product.product (idProduct, idType,name, features, image,createDate,updateDate,deleted) '
+						SET @insert = 'INSERT INTO product.product (idProduct, idType,name, features, image,createDate,updateDate,deleted) '
 
-								SET @values = (SELECT CONCAT('VALUES(',
-												QUOTENAME(@maxIDProduct,'()'),',',
-												QUOTENAME(@typeParam,'()'),',',
-												QUOTENAME(@nameParam,''''),',',
-												QUOTENAME(@json,''''),',',
-												'TO_BASE64(',QUOTENAME(@imageParam,''''),')',',',
-												'NOW()',',','NOW()',',','0',')'
-												));
+						SET @values = (SELECT CONCAT('VALUES(',
+										QUOTENAME(@maxIDProduct,'()'),',',
+										QUOTENAME(@typeParam,'()'),',',
+										QUOTENAME(@nameParam,''''),',',
+										QUOTENAME(@json,''''),',',
+										'TO_BASE64(',QUOTENAME(@imageParam,''''),')',',',
+										'NOW()',',','NOW()',',','0',')'
+										));
 
-							declare @query varchar(max)
-							set @query=@insert+@values
-							--print @query
+					declare @query varchar(max)
+					set @query=@insert+@values
 
-							EXEC(@query)AT [UNIVERSAL-MYSQL]
+					EXEC(@query)AT [UNIVERSAL-MYSQL]
 
 					--insert products on stores in the US
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @idProduct = @maxIDProduct, @globalPrice = @globalPriceParam, @image = @imageParam;
@@ -1057,6 +1056,7 @@ BEGIN
 			BEGIN
 				RAISERROR ('Product already exist.', 11, 1);
 			END
+		SELECT 'Succes'
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -1071,3 +1071,34 @@ BEGIN
 
 END
 GO
+
+
+
+CREATE PROCEDURE employeeReport
+	@departamento INT,
+    @calificación INT,
+	@salario MONEY
+AS
+  BEGIN TRY   -- statements that may cause exceptions
+
+	SELECT(
+	SELECT E.idEmployee, E.idDepartment, R.calification 
+	FROM openquery([UNIVERSAL-MYSQL],'select idEmployee,idDepartment from employee.employee') E
+	INNER JOIN 
+	(SELECT idEmployee,calification FROM openquery([UNIVERSAL-MYSQL],'select idEmployee,calification from employee.review'))R
+	ON R.idEmployee = E.idEmployee
+	WHERE E.idDepartment = @departamento AND R.calification = @departamento
+	FOR JSON AUTO) as employeeReport
+	
+
+	 
+END TRY  
+BEGIN CATCH  -- statements that handle exception
+			 SELECT  
+            ERROR_NUMBER() AS ErrorNumber  
+            ,ERROR_SEVERITY() AS ErrorSeverity  
+            ,ERROR_STATE() AS ErrorState  
+            ,ERROR_PROCEDURE() AS ErrorProcedure  
+            ,ERROR_LINE() AS ErrorLine  
+            ,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH
