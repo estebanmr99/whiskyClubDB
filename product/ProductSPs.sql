@@ -4,7 +4,7 @@ CREATE PROCEDURE prcGetProductsWithSales()
 BEGIN
 	SET SQL_SAFE_UPDATES = 0;
 	DROP TABLE IF EXISTS tempProducts;
-	CREATE TEMPORARY TABLE tempProducts (idProduct int, idType int, productName varchar(50), features JSON, image varchar(16000), sales int);
+	CREATE TEMPORARY TABLE tempProducts (idProduct int, idType int, productName varchar(50), features JSON, image varchar(8000), sales int);
     
     INSERT INTO tempProducts
     SELECT

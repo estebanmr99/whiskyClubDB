@@ -643,8 +643,8 @@ GO
 
 
 CREATE PROCEDURE CRUD_product_type
-	@idType INT,
-    @name VARCHAR(50),
+	@idType INT = null,
+    @name VARCHAR(50) = null,
 	@action CHAR(1)
 AS
   BEGIN TRY   -- statements that may cause exceptions
@@ -661,26 +661,30 @@ AS
 					QUOTENAME(@idType,'()')));
 
 	IF @action = 'C'
-	BEGIN 
+		BEGIN 
 
-	INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT name,deleted FROM product.product_type')   
-    VALUES(@name,0)
-		
-	END
+			INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT name, deleted FROM product.product_type')   
+			VALUES(@name,0)
+			
+		END
 	IF @action = 'R'
-	BEGIN 
+		BEGIN 
+			DECLARE @types TABLE (idType int, name varchar(255));
 
-	SELECT idType,name,deleted FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idType,name,deleted FROM product.product_type')  
+			INSERT INTO @types
+			SELECT idType, name FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idType,name,deleted FROM product.product_type') WHERE deleted = 0
 
-	END
+			SELECT(SELECT idType, name FROM @types FOR JSON AUTO) as productTypes
+
+		END
 	IF @action='U'
-	BEGIN 
-		EXEC(@update)AT [UNIVERSAL-MYSQL] 
-	END
+		BEGIN 
+			EXEC(@update) AT [UNIVERSAL-MYSQL] 
+		END
 	IF @action= 'D'
-	BEGIN
-		EXEC(@delete)AT [UNIVERSAL-MYSQL] 
-	END;
+		BEGIN
+			EXEC(@delete) AT [UNIVERSAL-MYSQL] 
+		END;
 	 
 END TRY  
 BEGIN CATCH  -- statements that handle exception
@@ -691,11 +695,9 @@ BEGIN CATCH  -- statements that handle exception
             ,ERROR_PROCEDURE() AS ErrorProcedure  
             ,ERROR_LINE() AS ErrorLine  
             ,ERROR_MESSAGE() AS ErrorMessage;
-END CATCH  
+END CATCH
 
-
-
-
+-- EXECUTE CRUD_product_type @action = 'R'
 
 --
 CREATE PROCEDURE prcUpdateEmploBySotre
@@ -914,7 +916,7 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE prcUpdateStoreInventory
+CREATE PROCEDURE prcGetAllProducts
 @searchQuery varchar(255),
 @idUserParam int,
 @idType int,
@@ -950,29 +952,32 @@ BEGIN
 		INNER JOIN @products as p on sp.idProduct = p.idProduct
 
 		IF @order = 'Asc'
+			SELECT (
 			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
 			FROM @storeProducts
 			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
 					(idType = isnull(@idType, idType)) AND 
 					(distanceUser <= isnull(@distance, distanceUser)) AND 
 					(localPrice <= isnull(@price, localPrice))
-			ORDER BY productName ASC
+			ORDER BY productName ASC FOR JSON AUTO ) AS allProducts
 		ELSE IF @order = 'Desc'
+			SELECT (
 			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
 			FROM @storeProducts
 			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
 					(idType = isnull(@idType, idType)) AND 
 					(distanceUser <= isnull(@distance, distanceUser)) AND 
 					(localPrice <= isnull(@price, localPrice))
-			ORDER BY productName DESC
+			ORDER BY productName DESC FOR JSON AUTO ) AS allProducts
 		ELSE IF @order = 'Popular'
+			SELECT (
 			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
 			FROM @storeProducts
 			WHERE (productName LIKE '%' + @searchQuery + '%') AND 
 					(idType = isnull(@idType, idType)) AND 
 					(distanceUser <= isnull(@distance, distanceUser)) AND 
 					(localPrice <= isnull(@price, localPrice))
-			ORDER BY sales DESC
+			ORDER BY sales DESC FOR JSON AUTO ) AS allProducts
 		ELSE
 			RAISERROR ( 'Whoops, an error occurred: Order not possible', 11, 1);
 
