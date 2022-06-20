@@ -7,21 +7,25 @@ CREATE PROCEDURE prcFindUserByEmail
 AS
 BEGIN
 	BEGIN TRY
-
+		-- The result of this operation quickly removes all data from a table
 		TRUNCATE TABLE [masterdb].[dbo].[tempUserJson]
-
+		-- call sp in USA instance to search for certain user by email, and if founded, insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempUserJson]
 		EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindUserByEmail] @email = @emailParam;
-
+		
+		-- call sp in SCOTLAND instance to search for certain user by email, and if founded, insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempUserJson]
 		EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindUserByEmail] @email = @emailParam;
 
+		-- call sp in IRELAND instance to search for certain user by email, and if founded, insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempUserJson]
 		EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindUserByEmail] @email = @emailParam;
-
+		
+		-- Delete table if nothing is found
 		DELETE [masterdb].[dbo].[tempUserJson] WHERE userFound IS NULL;
 
 		IF @select = 1
+			-- return table if user is found
 			SELECT userFound FROM [masterdb].[dbo].[tempUserJson] WHERE userFound IS NOT NULL;
 
 	END TRY 
@@ -46,23 +50,29 @@ CREATE PROCEDURE prcGetNextUserId
 AS
 BEGIN
 	BEGIN TRY
+		-- The result of this operation quickly removes all data from a table
 		TRUNCATE TABLE [masterdb].[dbo].[tempNextUserId];
 		DECLARE @maxIDuser INT;
-
+		
+		-- call sp in USA instance to search for the max idUser , insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempNextUserId]
 		EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcGetNextUserId];
-
+		
+		-- call sp in SCOTLAND instance to search for the max idUser , insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempNextUserId]
 		EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcGetNextUserId];
-
+		
+		-- call sp in IRELAND instance to search for the max idUser , insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempNextUserId]
 		EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcGetNextUserId];
-
+			
+		-- Get the max idUser for temp table +1, for the new insert of data
 		SELECT @maxIDuser = (MAX(maxIDuser) + 1) FROM [masterdb].[dbo].[tempNextUserId];
-
+		
+		--insert the new maxIdUser 
 		INSERT INTO [masterdb].[dbo].[tempNextUserId]
 		VALUES (@maxIDuser);
-
+		-- remove all idUsers that are less than the new maxIdUser from temp table
 		DELETE [masterdb].[dbo].[tempNextUserId] WHERE maxIDuser < @maxIDuser;
 
 		IF @select = 1
@@ -97,15 +107,19 @@ CREATE PROCEDURE prcRegisterUser
 AS
 BEGIN
 	BEGIN TRY 
+		-- validate if the user already exist
 		EXECUTE [masterdb].[dbo].[prcFindUserByEmail] @emailParam = @emailParam, @select = 0;
 
 		IF NOT EXISTS (SELECT * FROM [masterdb].[dbo].[tempUserJson])
 			BEGIN
+				--call sp for next user id
 				EXECUTE [masterdb].[dbo].[prcGetNextUserId] @select = 0;
-
+				
+				-- declare new MaxIdUSer
 				DECLARE @maxIDuser int;
 				SELECT @maxIDuser = MAX(maxIDuser) FROM [dbo].[tempNextUserId];
-
+				
+				-- find the country of the new user for calling sp on that instance
 				IF @country = 'United States'
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcRegisterUser] @iduser = @maxIDuser, @email = @emailParam, @password = @passwordParam, @locationLat = @locationLatParam, @locationLng = @locationLngParam, @name = @nameParam, @lastName = @lastnameParam, @telephone = @telephoneParam;
 				ELSE IF @country = 'Scotland'
@@ -147,15 +161,18 @@ CREATE PROCEDURE prcFindProductByName
 AS
 BEGIN
 	BEGIN TRY
-
+		-- The result of this operation quickly removes all data from a table
 		TRUNCATE TABLE [masterdb].[dbo].[tempProductJson]
-		-- insert the product on the temp table if found
+		
+		-- call sp in USA instance to search for certain product by name, and if founded, insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempProductJson]
 		EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindProductByName] @name = @nameParam;
-
+		
+		-- call sp in SCOTLAND instance to search for certain product by name, and if founded, insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempProductJson]
 		EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindProductByName] @name = @nameParam;
-
+		
+		-- call sp in IRELAND instance to search for certain product by name, and if founded, insert into temporal table
 		INSERT INTO [masterdb].[dbo].[tempProductJson]
 		EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindProductByName] @name = @nameParam;
 		
@@ -232,6 +249,8 @@ GO
 
 -- EXECUTE prcRegisterUser @email = 'usAdmin@whiskyclub.com';
 
+
+-- Stored procedure to return information from each store
 CREATE PROCEDURE prcGetStoresInfo
 AS
 BEGIN
@@ -242,18 +261,19 @@ BEGIN
 		 country varchar(30)
 		);
 
-		-- Ireland stores info
+		-- call sp to insert Ireland stores info on the @storesInfo table
 		INSERT INTO @storesInfo
 		EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcGetStoresInfo]
 
-		-- Scotland stores info
+		-- call sp to insert Scotland stores info on the @storesInfo table
 		INSERT INTO @storesInfo
 		EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcGetStoresInfo]
 
-		-- United States stores info
+		-- call sp to insert USA stores info on the @storesInfo table
 		INSERT INTO @storesInfo
 		EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcGetStoresInfo]
-
+		
+		-- return info of all the stores
 		SELECT (SELECT idStore, name, country FROM @storesInfo FOR JSON AUTO) AS storesInfo
 
 	END TRY 
@@ -881,7 +901,7 @@ CREATE PROCEDURE prcCreateProduct
 AS
 BEGIN
 	BEGIN TRY 
-	 
+	 -- get the max idProduct +1 and set it as the new idProduct for the new insert
 	 DECLARE @maxIDProduct int;
         SET @maxIDProduct = 0; 
 		SELECT @maxIDProduct = MAX(idProduct) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct FROM product.product')
@@ -1014,7 +1034,7 @@ CREATE PROCEDURE prcstoreProductReviews
 AS
 BEGIN
 	BEGIN TRY
-	-- get the last idReview for the new insert
+	-- get the last idReview +1, for the new insert
 		 DECLARE @maxIdReview int;
         SET @maxIdReview = 0; 
 		SELECT @maxIdReview = MAX(idReview) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idReview FROM product.review')
