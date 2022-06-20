@@ -2,6 +2,7 @@
 -- The database has 3 instances, because of this we well have 3 section for each instance.
 
 -------------------------------------------------------------------------------------------------------------------------------- USA
+-- Procedure to find user by email
 CREATE PROCEDURE prcFindUserByEmail
 @email varchar(50)
 AS
@@ -32,6 +33,7 @@ GO
 
 -- EXECUTE prcFindUserByEmail @email = 'usAdmin@whiskyclub.com';
 
+-- Procedure to find next user id to create a new user
 CREATE PROCEDURE prcGetNextUserId
 AS
 BEGIN
@@ -56,6 +58,7 @@ GO
 
 -- EXECUTE prcGetNextUserId;
 
+-- Procedure to register a user
 CREATE PROCEDURE prcRegisterUser
 @iduser int,
 @email varchar(50),
@@ -90,6 +93,7 @@ GO
 
 -- EXECUTE prcRegisterUser @idUser = 100, @email = 'test@test.com', @password = 'test', @locationLat = 1, @locationLng = 1, @name = 'test', @lastName = 'test', @telephone = '8888899';
 
+-- Procedure to add a suscription to a user
 CREATE PROCEDURE prcSubscription
 @idUser int,
 @idLevel int
@@ -116,6 +120,7 @@ BEGIN
 END
 GO
 
+-- Procedure to create a new product in a store
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
 @globalPrice money,
@@ -147,14 +152,15 @@ BEGIN
 END
 GO
 
+-- Procedure to find a employee by their id
 CREATE PROCEDURE prcFindEmployeesByStore
 @store int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
-	-- find all employees that are not deleted		
-	IF @store = 7
+		BEGIN
+		-- find all employees that are not deleted		
+		IF @store = 7
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store1].[dbo].[employee] eh
 					WHERE deleted =0
 
@@ -167,7 +173,7 @@ BEGIN
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store3].[dbo].[employee] eh
 					WHERE deleted =0 
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
 			END
@@ -187,28 +193,29 @@ GO
 
 -- exec prcFindEmployeesByStore @store=3
 
+-- Procedure to find all employees by the store id
 CREATE PROCEDURE prcFindEmployeeByStore
 @store int,
 @idEmployee int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
-			-- find specific employee that macth idEmployee	 on store1
-				IF @store = 7
-					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store1].[dbo].[employee] eh
-					WHERE eh.idEmployee = @idEmployee 
+		BEGIN
+		-- find specific employee that macth idEmployee	 on store1
+		IF @store = 7
+			SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store1].[dbo].[employee] eh
+			WHERE eh.idEmployee = @idEmployee 
 
-	-- find specific employee that macth idEmployee	on store2
+		-- find specific employee that macth idEmployee	on store2
         ELSE IF @store = 8
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store2].[dbo].[employee] eh
 					WHERE eh.idEmployee = @idEmployee 
-	-- find specific employee that macth idEmployee	 on store3
-        ELSE IF @store = 9
-					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store3].[dbo].[employee] eh
-					WHERE eh.idEmployee = @idEmployee 
-          
-			END
+		-- find specific employee that macth idEmployee	 on store3
+		ELSE IF @store = 9
+				SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store3].[dbo].[employee] eh
+				WHERE eh.idEmployee = @idEmployee 
+		
+		END
 
 	END TRY 
 		BEGIN CATCH
@@ -223,7 +230,7 @@ BEGIN
 END
 GO
 
-
+-- Procedure to update the employe from store
 CREATE PROCEDURE prcUpdateEmployeeByStore
 @store int,
 @idEmployee int, 
@@ -232,7 +239,7 @@ CREATE PROCEDURE prcUpdateEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
+		BEGIN
 		IF @store = 7
 					UPDATE [usa_store1].[dbo].[employee]
 					SET localSalary= @localSalary,
@@ -269,6 +276,7 @@ BEGIN
 END
 GO
 
+-- Procedure to create a new employee
 CREATE PROCEDURE prcInsertEmployeeByStore
 @store int,
 @idEmployee int, 
@@ -310,14 +318,15 @@ END
 GO
 
 
+-- Procedure to delete a employee
 CREATE PROCEDURE prcDeleteEmployeeByStore
 @store int,
 @idEmployee int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
-			-- delete employee by specific store
+		BEGIN
+		-- delete employee by specific store
 		IF @store = 7
 					UPDATE [usa_store1].[dbo].[employee]
 					SET deleted = 1
@@ -352,6 +361,7 @@ END
 GO
 
 -------------------------------------------------------------------------------------------------------------------------------- Ireland
+-- Procedure to find user by email
 CREATE PROCEDURE prcFindUserByEmail
 @email varchar(50)
 AS
@@ -382,6 +392,7 @@ GO
 
 -- EXECUTE prcFindUserByEmail @email = 'usAdmin@whiskyclub.com';
 
+-- Procedure to find next user id to create a new user
 CREATE PROCEDURE prcGetNextUserId
 AS
 BEGIN
@@ -406,6 +417,7 @@ GO
 
 -- EXECUTE prcGetNextUserId;
 
+-- Procedure to register a user
 CREATE PROCEDURE prcRegisterUser
 @iduser int,
 @email varchar(50),
@@ -439,6 +451,7 @@ GO
 
 -- EXECUTE prcRegisterUser @idUser = 100, @email = 'test@test.com', @password = 'test', @locationLat = 1, @locationLng = 1, @name = 'test', @lastName = 'test', @telephone = '8888899';
 
+-- Procedure to add a suscription to a user
 CREATE PROCEDURE prcSubscription
 @idUser int,
 @idLevel int
@@ -465,14 +478,15 @@ BEGIN
 END
 GO
 
+-- Procedure to create a new product in a store
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
 @globalPrice money,
 @image varbinary(max)
 AS
 BEGIN
-		DECLARE @localPrice money
-		 set @localPrice = (@globalPrice*0.96)
+	DECLARE @localPrice money
+	set @localPrice = (@globalPrice*0.96)
 	BEGIN TRY 
 		
 
@@ -497,16 +511,17 @@ BEGIN
 END
 GO
 
+-- Procedure to find all employees by the store id
 CREATE PROCEDURE prcFindEmployeeByStore
 @store int,
 @idEmployee int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
-				IF @store = 1
-					SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store1].[dbo].[employee] eh
-					WHERE eh.idEmployee = @idEmployee 
+		BEGIN
+			IF @store = 1
+				SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store1].[dbo].[employee] eh
+				WHERE eh.idEmployee = @idEmployee 
 
 
         ELSE IF @store = 2
@@ -517,30 +532,31 @@ BEGIN
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store3].[dbo].[employee] eh
 					WHERE eh.idEmployee = @idEmployee 
           
-			END
+		END
 
-	END TRY 
-		BEGIN CATCH
-			SELECT
-			  ERROR_NUMBER() AS ErrorNumber  
-					,ERROR_SEVERITY() AS ErrorSeverity  
-					,ERROR_STATE() AS ErrorState  
-					,ERROR_PROCEDURE() AS ErrorProcedure  
-					,ERROR_LINE() AS ErrorLine  
-					,ERROR_MESSAGE() AS ErrorMessage;
-		END CATCH
+END TRY 
+	BEGIN CATCH
+		SELECT
+			ERROR_NUMBER() AS ErrorNumber  
+				,ERROR_SEVERITY() AS ErrorSeverity  
+				,ERROR_STATE() AS ErrorState  
+				,ERROR_PROCEDURE() AS ErrorProcedure  
+				,ERROR_LINE() AS ErrorLine  
+				,ERROR_MESSAGE() AS ErrorMessage;
+	END CATCH
 END
 GO
 
+-- Procedure to find a employee by their id
 CREATE PROCEDURE prcFindEmployeesByStore
 @store int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
-				IF @store = 1
-					SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store1].[dbo].[employee] eh
-					WHERE deleted = 0 
+		BEGIN
+		IF @store = 1
+			SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store1].[dbo].[employee] eh
+			WHERE deleted = 0 
 
 
         ELSE IF @store = 2
@@ -551,10 +567,10 @@ BEGIN
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [ie_store3].[dbo].[employee] eh
 					WHERE deleted = 0 
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
-			END
+		END
 
 	END TRY 
 		BEGIN CATCH
@@ -571,6 +587,7 @@ GO
 
 -- exec prcFindEmployeesByStore @store=3
 
+-- Procedure to create a new employee
 CREATE PROCEDURE prcInsertEmployeeByStore
 @store int,
 @idEmployee int, 
@@ -579,7 +596,7 @@ CREATE PROCEDURE prcInsertEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
+		BEGIN
 		IF @store = 1
 					INSERT INTO [ie_store1].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
 					VALUES (@idEmployee,@localSalary, @globalSalary,0)
@@ -591,11 +608,11 @@ BEGIN
 					INSERT INTO [ie_store3].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
 					VALUES (@idEmployee,@localSalary, @globalSalary,0)
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
         
-			END
+		END
 
 	END TRY 
 		BEGIN CATCH
@@ -611,6 +628,7 @@ END
 GO
 
 
+-- Procedure to update the employe from store
 CREATE PROCEDURE prcUpdateEmployeeByStore
 @store int,
 @idEmployee int, 
@@ -619,7 +637,7 @@ CREATE PROCEDURE prcUpdateEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
+		BEGIN
 		IF @store = 1
 					UPDATE [ie_store1].[dbo].[employee]
 					SET localSalary= @localSalary,
@@ -637,11 +655,11 @@ BEGIN
 						globalSalary= @globalSalary
 					WHERE idEmployee = @idEmployee 
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
         
-			END
+		END
 
 	END TRY 
 		BEGIN CATCH
@@ -657,13 +675,14 @@ END
 GO
 
 
+-- Procedure to delete a employee
 CREATE PROCEDURE prcDeleteEmployeeByStore
 @store int,
 @idEmployee int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
+		BEGIN
 		IF @store = 1
 					UPDATE [ie_store1].[dbo].[employee]
 					SET deleted = 1
@@ -678,11 +697,11 @@ BEGIN
 					SET deleted = 1
 					WHERE idEmployee = @idEmployee
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
         
-			END
+		END
 
 	END TRY 
 		BEGIN CATCH
@@ -698,6 +717,7 @@ END
 GO
 
 -------------------------------------------------------------------------------------------------------------------------------- Scotland
+-- Procedure to find user by email
 CREATE PROCEDURE prcFindUserByEmail
 @email varchar(50)
 AS
@@ -727,6 +747,7 @@ GO
 
 -- EXECUTE prcFindUserByEmail @email = 'usAdmin@whiskyclub.com';
 
+-- Procedure to find next user id to create a new user
 CREATE PROCEDURE prcGetNextUserId
 AS
 BEGIN
@@ -750,6 +771,7 @@ GO
 
 -- EXECUTE prcGetNextUserId;
 
+-- Procedure to register a user
 CREATE PROCEDURE prcRegisterUser
 @iduser int,
 @email varchar(50),
@@ -783,6 +805,7 @@ GO
 
 -- EXECUTE prcRegisterUser @idUser = 100, @email = 'test@test.com', @password = 'test', @locationLat = 1, @locationLng = 1, @name = 'test', @lastName = 'test', @telephone = '8888899';
 
+-- Procedure to add a suscription to a user
 CREATE PROCEDURE prcSubscription
 @idUser int,
 @idLevel int
@@ -809,6 +832,7 @@ BEGIN
 END
 GO
 
+-- Procedure to create a new product in a store
 CREATE PROCEDURE prcCreateProduct
 @idProduct int,
 @globalPrice money,
@@ -842,16 +866,17 @@ END
 GO
 
 
+-- Procedure to find all employees by the store id
 CREATE PROCEDURE prcFindEmployeeByStore
 @store int,
 @idEmployee int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
-				IF @store = 4
-					SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store1].[dbo].[employee] eh
-					WHERE eh.idEmployee = @idEmployee 
+		BEGIN
+			IF @store = 4
+				SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store1].[dbo].[employee] eh
+				WHERE eh.idEmployee = @idEmployee 
 
 
         ELSE IF @store = 5
@@ -862,7 +887,7 @@ BEGIN
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store3].[dbo].[employee] eh
 					WHERE eh.idEmployee = @idEmployee 
           
-			END
+		END
 
 	END TRY 
 		BEGIN CATCH
@@ -877,15 +902,16 @@ BEGIN
 END
 GO
 
+-- Procedure to find a employee by their id
 CREATE PROCEDURE prcFindEmployeesByStore
 @store int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
-				IF @store = 4
-					SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store1].[dbo].[employee] eh
-					WHERE deleted = 0 
+		BEGIN
+			IF @store = 4
+				SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store1].[dbo].[employee] eh
+				WHERE deleted = 0 
 
 
         ELSE IF @store = 5
@@ -896,10 +922,10 @@ BEGIN
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [stk_store3].[dbo].[employee] eh
 					WHERE deleted = 0 
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
-			END
+		END
 
 	END TRY 
 		BEGIN CATCH
@@ -916,6 +942,7 @@ GO
 
 -- exec prcFindEmployeesByStore @store=3
 
+-- Procedure to update the employe from store
 CREATE PROCEDURE prcUpdateEmployeeByStore
 @store int,
 @idEmployee int, 
@@ -924,7 +951,7 @@ CREATE PROCEDURE prcUpdateEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
+		BEGIN
 		IF @store = 3
 					UPDATE [stk_store1].[dbo].[employee]
 					SET localSalary= @localSalary,
@@ -942,7 +969,7 @@ BEGIN
 						globalSalary= @globalSalary
 					WHERE idEmployee = @idEmployee 
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
         
@@ -962,6 +989,7 @@ END
 GO
 
 
+-- Procedure to create a new employee
 CREATE PROCEDURE prcInsertEmployeeByStore
 @store int,
 @idEmployee int, 
@@ -970,7 +998,7 @@ CREATE PROCEDURE prcInsertEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
+		BEGIN
 		IF @store = 4
 					INSERT INTO [stk_store1].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
 					VALUES (@idEmployee,@localSalary, @globalSalary,0)
@@ -982,7 +1010,7 @@ BEGIN
 					INSERT INTO [stk_store3].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
 					VALUES (@idEmployee,@localSalary, @globalSalary,0)
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
         
@@ -1001,13 +1029,14 @@ BEGIN
 END
 GO
 
+-- Procedure to delete a employee
 CREATE PROCEDURE prcDeleteEmployeeByStore
 @store int,
 @idEmployee int
 AS
 BEGIN
 	BEGIN TRY 
-			BEGIN
+		BEGIN
 		IF @store = 3
 					UPDATE [stk_store1].[dbo].[employee]
 					SET deleted = 1
@@ -1022,7 +1051,7 @@ BEGIN
 					SET deleted = 1
 					WHERE idEmployee = @idEmployee
           
-			Else
+		Else
 			RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
         

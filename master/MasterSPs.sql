@@ -197,11 +197,7 @@ BEGIN
 END
 GO
 
-
 -- EXECUTE prcFindProductByName @nameParam = 'Wisky';
-
-
-
 
 -- Store procedure for subscriptions
 CREATE PROCEDURE prcSubscription
@@ -246,9 +242,7 @@ BEGIN
 END
 GO
 
-
 -- EXECUTE prcRegisterUser @email = 'usAdmin@whiskyclub.com';
-
 
 -- Stored procedure to return information from each store
 CREATE PROCEDURE prcGetStoresInfo
@@ -293,7 +287,7 @@ GO
 
 -- EXECUTE prcGetStoresInfo
 
-
+-- Procedure to return information of each product
 CREATE PROCEDURE prcGetProductsInfo
 AS
 BEGIN
@@ -328,7 +322,7 @@ END
 GO
 
 -- EXECUTE prcGetProductsInfo
-
+-- Procedure to return all stores inventory
 CREATE PROCEDURE prcGetStoresInventory
 AS
 BEGIN
@@ -355,6 +349,7 @@ BEGIN
 		INSERT INTO @storesInventory
 		EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcGetStoresInventory]
 
+		-- return data as json if they were retrieved successfully
 		IF EXISTS (SELECT idProduct FROM @storesInventory)
 			SELECT (SELECT idProduct, currency, localPrice, globalPrice, quantity, idStore FROM @storesInventory FOR JSON AUTO, INCLUDE_NULL_VALUES) AS storesInventory
 
@@ -374,7 +369,7 @@ END
 GO
 
 -- EXECUTE prcGetStoresInventory
-
+-- Pocedure to update the inventory of each store
 CREATE PROCEDURE prcUpdateStoreInventory
 @idStoreParam int,
 @idProductParam int,
@@ -386,30 +381,42 @@ CREATE PROCEDURE prcUpdateStoreInventory
 AS
 BEGIN
 	BEGIN TRY
-
+		-- Filter by country
 		IF @country = 'United States'
+		BEGIN
+			-- update on the correct store in the United States
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([UNITEDSTATESSQL] , 'SELECT idStore FROM [usa_store1].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([UNITEDSTATESSQL] , 'SELECT idStore FROM [usa_store2].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [UNITEDSTATESSQL].[usa_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [UNITEDSTATESSQL].[usa_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([UNITEDSTATESSQL] , 'SELECT idStore FROM [usa_store3].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [UNITEDSTATESSQL].[usa_store3].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [UNITEDSTATESSQL].[usa_store3].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
+		END
 		ELSE IF @country = 'Scotland'
+		BEGIN
+			-- update on the correct store in the Scotland
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([SCOTLANDSQL] , 'SELECT idStore FROM [stk_store1].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([SCOTLANDSQL] , 'SELECT idStore FROM [stk_store2].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [SCOTLANDSQL].[stk_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [SCOTLANDSQL].[stk_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([SCOTLANDSQL] , 'SELECT idStore FROM [stk_store3].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [SCOTLANDSQL].[stk_store3].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [SCOTLANDSQL].[stk_store3].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
+		END
 		ELSE IF @country = 'Ireland'
+		BEGIN
+			-- update on the correct store in the Ireland
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([IRELANDSQL] , 'SELECT idStore FROM [ie_store1].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([IRELANDSQL] , 'SELECT idStore FROM [ie_store2].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [IRELANDSQL].[ie_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [IRELANDSQL].[ie_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
 			IF EXISTS(SELECT idStore FROM OPENQUERY ([IRELANDSQL] , 'SELECT idStore FROM [ie_store3].[dbo].[store]') WHERE idStore = @idStoreParam)
-				EXECUTE [IRELANDSQL].[ie_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @glocalPrice = @globalPriceParam, @quantity = @quantityParam
+				EXECUTE [IRELANDSQL].[ie_store2].[dbo].[prcUpdateStoreInventory] @idStore = @idStoreParam, @idProduct = @idProductParam, @currency = @currencyParam, @localPrice = @localPriceParam, @globalPrice = @globalPriceParam, @quantity = @quantityParam
+		END
 		ELSE
+		BEGIN
+			-- if country is not specified, return error
 			RAISERROR ( 'Whoops, an error occurred: Country not found', 11, 1);
+		END
 
 		SELECT 'Updated';
 
@@ -430,7 +437,7 @@ END
 GO
 
 -- EXECUTE prcUpdateStoreInventory
-
+-- procedure to find a employee by id
 CREATE PROCEDURE prcFindEmployeeByStore
 @store int,
 @idEmployee int,
@@ -504,7 +511,7 @@ GO
 -- EXECUTE prcFindEmployeeByStore @store = 1,@idEmployee= 1, @country = 'Ireland'
 --EXECUTE prcFindEmployeeByStore @store = 9,@idEmployee= 12, @country = 'United States'
 
-
+-- procedure to get all employees from a store
 CREATE PROCEDURE prcFindEmployeesByStore
 @store int,
 @country varchar(50)
@@ -579,7 +586,7 @@ BEGIN
 END
 GO
 
-
+-- procedure to perform CRUD operations on product types
 CREATE PROCEDURE CRUD_product_type
 	@idType INT = null,
     @name VARCHAR(50) = null,
@@ -589,15 +596,18 @@ AS
 
 	DECLARE @update VARCHAR(max),@delete VARCHAR(max)
 
+	-- prepare for delete operation
 	SET @delete = (SELECT CONCAT('UPDATE product.product_type SET deleted = 1 ',
 					'WHERE idType=',
 					QUOTENAME(@idType,'()')));
 
+	-- prepare for update operation
 	SET @update = (SELECT CONCAT('UPDATE product.product_type SET name=',
 					QUOTENAME(@name,''''),
 					' WHERE idType=',
 					QUOTENAME(@idType,'()')));
 
+	-- if create
 	IF @action = 'C'
 		BEGIN 
 
@@ -605,6 +615,7 @@ AS
 			VALUES(@name,0)
 			
 		END
+	-- if read
 	IF @action = 'R'
 		BEGIN 
 			DECLARE @types TABLE (idType int, name varchar(255));
@@ -615,10 +626,12 @@ AS
 			SELECT(SELECT idType, name FROM @types FOR JSON AUTO) as productTypes
 
 		END
+	-- if update
 	IF @action='U'
 		BEGIN 
 			EXEC(@update) AT [UNIVERSAL-MYSQL] 
 		END
+	-- if delete
 	IF @action= 'D'
 		BEGIN
 			EXEC(@delete) AT [UNIVERSAL-MYSQL] 
@@ -637,6 +650,7 @@ END CATCH
 
 -- EXECUTE CRUD_product_type @action = 'R'
 
+-- procedure to update employee in store
 CREATE PROCEDURE prcUpdateEmployeeByStore
 @store int,
 @idEmployee int,
@@ -663,7 +677,7 @@ BEGIN
 
         	BEGIN		
 				-- call procedure on the country of the user
-            			IF @country = 'United States'
+            	IF @country = 'United States'
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcUpdateEmployeeByStore] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
 				ELSE IF @country = 'Scotland'
 					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcUpdateEmployeeByStore] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
@@ -699,9 +713,7 @@ GO
 --@globalSalary =0,
 --@country= 'United States'
 
-
---select * from [UNITEDSTATESSQL].[usa_store1].[dbo].[employee]
-
+-- Procedure to create a new employee
 CREATE PROCEDURE prcInsertEmployeeByStore
 @store int,
 @name varchar(50),
@@ -720,11 +732,11 @@ BEGIN
 		SET @maxIDuser = @maxIDuser+1; 
         
 			BEGIN	
-					-- insert the new employee into the universal Mysql employee database
-					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idEmployee,name,lastName,birthDate,createDate,updateDate,deleted FROM employee.employee')   
-					VALUES(@maxIDuser,@name,@lastName,@birthDate,(SELECT GETDATE()),(SELECT GETDATE()),0)
+				-- insert the new employee into the universal Mysql employee database
+				INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idEmployee,name,lastName,birthDate,createDate,updateDate,deleted FROM employee.employee')   
+				VALUES(@maxIDuser,@name,@lastName,@birthDate,(SELECT GETDATE()),(SELECT GETDATE()),0)
 						
-		-- call procedure on the country of the user
+			-- call procedure on the country of the user
             IF @country = 'United States'
 
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcInsertEmployeeByStore] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
@@ -740,7 +752,7 @@ BEGIN
 			ELSE
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
             END
-		SELECT 'Succes'
+		SELECT 'Success'
 	END TRY 
 	BEGIN CATCH
 	SELECT
@@ -757,7 +769,7 @@ END
 GO
 
 
-
+-- Procedure to delete a employee by store and idEmployee
 CREATE PROCEDURE prcDeleteEmployeeByStore
 @store int,
 @idEmployee int,
@@ -765,7 +777,7 @@ CREATE PROCEDURE prcDeleteEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
-			-- Update Universal Mysql employee database to deleted =1 on the selected idEmployee
+		-- Update Universal Mysql employee database to deleted =1 on the selected idEmployee
 		DECLARE @select varchar(150),@update varchar(150),@sql varchar(300)
 		set @select = 'update OPENQUERY([UNIVERSAL-MYSQL],
 					''SELECT idEmployee,deleted FROM employee.employee where (idEmployee ='+ CAST(@idEmployee as nvarchar(30))+')'')'
@@ -774,9 +786,8 @@ BEGIN
 		set @sql = @select + @update
 		EXEC(@sql)
 
-            BEGIN
-	    
-	    --find the country of the user and call the procedure for deleting the user by setting deleted =1			
+        BEGIN
+	    	--find the country of the user and call the procedure for deleting the user by setting deleted =1			
             IF @country = 'United States'
 
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcDeleteEmployeeByStore] @Store=@store, @IdEmployee = @idEmployee;
@@ -807,7 +818,7 @@ BEGIN
 END
 GO
 
-
+-- Procedure to get all information about products by country and apply a filters
 CREATE PROCEDURE prcGetAllProducts
 @searchQuery varchar(255),
 @idUserParam int,
@@ -819,30 +830,37 @@ CREATE PROCEDURE prcGetAllProducts
 AS
 BEGIN
 	BEGIN TRY
-
+		-- create table to store the products
 		DECLARE @storeProducts TABLE (idStore int, idProduct int, storeName varchar(50), storeLocation geography, productQuantity int, currency varchar(30), localPrice int, globalPrice int, distanceUser int, idType int, productName varchar(50), features varchar(8000), [image] varchar(MAX), sales int)
 
+		-- filter by country
 		IF @country = 'United States'
+			-- Get inventory from United States stores
 			INSERT INTO @storeProducts (idStore, idProduct, storeName, storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser)
 			EXECUTE [UNITEDSTATESSQL].[usa_store1].[dbo].[prcGetAllStoresInventory] @idUser = @idUserParam
 		ELSE IF @country = 'Scotland'
+			-- Get inventory from Scotland stores
 			INSERT INTO @storeProducts (idStore, idProduct, storeName, storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser)
 			EXECUTE [SCOTLANDSQL].[stk_store1].[dbo].[prcGetAllStoresInventory] @idUser = @idUserParam
 		ELSE IF @country = 'Ireland'
+			-- Get inventory from Ireland stores
 			INSERT INTO @storeProducts (idStore, idProduct, storeName, storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser)
 			EXECUTE [IRELANDSQL].[ie_store1].[dbo].[prcGetAllStoresInventory] @idUser = @idUserParam
 		ELSE
 			RAISERROR ( 'Whoops, an error occurred: Country not found', 11, 1);
 
+		-- Get all products information from mysql database
 		DECLARE @products TABLE (idProduct int, idType int, productName varchar(50), features varchar(8000), [image] varchar(MAX), sales int)
 		INSERT INTO @products
 		EXEC ('CALL product.prcGetProductsWithSales()') at [UNIVERSAL-MYSQL];
 
+		-- update the variable table with the information from the products table
 		UPDATE sp
 		SET sp.idType = p.idType, sp.productName = p.productName, sp.features = p.features, sp.image = p.image, sp.sales = p.sales
 		FROM @storeProducts as sp
 		INNER JOIN @products as p on sp.idProduct = p.idProduct
 
+		-- return products based on order and apply filters
 		IF @order = 'Asc'
 			SELECT (
 			SELECT idStore, idProduct, storeName storeLocation, productQuantity, currency, localPrice, globalPrice, distanceUser, idType, productName, features, [image], sales 
@@ -888,9 +906,9 @@ BEGIN
 END
 GO
 
--- EXECUTE prcUpdateStoreInventory @searchQuery = '', @idUserParam = 0, @idType = null, @distance = null, @price = null, @order = 'Popular', @country = 'United States'
+-- EXECUTE prcGetAllProducts @searchQuery = '', @idUserParam = 0, @idType = null, @distance = null, @price = null, @order = 'Popular', @country = 'United States'
 
-
+-- procedure to create a new product
 CREATE PROCEDURE prcCreateProduct
 @nameParam varchar(50),
 @typeParam int,
@@ -957,7 +975,7 @@ BEGIN
 END
 GO
 
-
+-- Procedure to create a report of employees
 CREATE PROCEDURE employeeReport
 	@departamento INT,
     @calificación INT,
@@ -966,6 +984,7 @@ AS
 BEGIN
   BEGIN TRY   -- statements that may cause exceptions
 
+	-- Get information from mysql database
 	SELECT(
 	SELECT E.idEmployee, E.idDepartment, R.calification 
 	FROM openquery([UNIVERSAL-MYSQL],'select idEmployee,idDepartment from employee.employee') E
@@ -992,7 +1011,7 @@ END CATCH
 END
 GO
 
-
+-- Procedure to retrieve the sales of a user
 CREATE PROCEDURE prcGetOrdersById
 @user int
 AS
@@ -1023,9 +1042,7 @@ BEGIN
 END
 GO
 
-
 -- stored procedure for storing product reviews
-
 CREATE PROCEDURE prcstoreProductReviews
 @idProduct int,
 @idUser int,
