@@ -892,7 +892,7 @@ BEGIN
 				DECLARE 
 				@values VARCHAR(max),
 				@insert VARCHAR(max),
-				@json nvarchar(max)=N'{"Aged": '+'"'+@agedParam+'"'+', "Presentation": '+'"'+@presentationParam+'"'+'}';
+				@json nvarchar(max)=N'{"aged": '+'"'+@agedParam+'"'+', "presentation": '+'"'+@presentationParam+'"'+'}';
 
 					SET @insert = 'INSERT INTO product.product (idProduct, idType,name, features, image,createDate,updateDate,deleted) '
 
@@ -943,6 +943,7 @@ CREATE PROCEDURE employeeReport
     @calificación INT,
 	@salario MONEY
 AS
+BEGIN
   BEGIN TRY   -- statements that may cause exceptions
 
 	SELECT(
@@ -956,8 +957,8 @@ AS
 	
 
 	 
-END TRY  
-	BEGIN CATCH
+	END TRY  
+BEGIN CATCH
 	SELECT
 	  ERROR_NUMBER() AS ErrorNumber  
             ,ERROR_SEVERITY() AS ErrorSeverity  
@@ -966,7 +967,7 @@ END TRY
             ,ERROR_LINE() AS ErrorLine  
             ,ERROR_MESSAGE() AS ErrorMessage;
 
-	END CATCH
+END CATCH
 
 END
 GO
