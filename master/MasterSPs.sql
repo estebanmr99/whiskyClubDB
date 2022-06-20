@@ -149,7 +149,7 @@ BEGIN
 	BEGIN TRY
 
 		TRUNCATE TABLE [masterdb].[dbo].[tempProductJson]
-
+		-- insert the product on the temp table if found
 		INSERT INTO [masterdb].[dbo].[tempProductJson]
 		EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindProductByName] @name = @nameParam;
 
@@ -158,9 +158,10 @@ BEGIN
 
 		INSERT INTO [masterdb].[dbo].[tempProductJson]
 		EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindProductByName] @name = @nameParam;
-
+		
+		-- delete table if productFound is null (there is no product with the same name)
 		DELETE [masterdb].[dbo].[tempProductJson] WHERE productFound IS NULL;
-
+		
 		IF @select = 1
 			SELECT productFound FROM [masterdb].[dbo].[tempProductJson] WHERE productFound IS NOT NULL;
 
@@ -183,105 +184,7 @@ GO
 -- EXECUTE prcFindProductByName @nameParam = 'Wisky';
 
 
--- Store procedure to get next Product ID (Masterdb)
-CREATE PROCEDURE prcGetNextProductId
-@select bit = 1
-AS
-BEGIN
-	BEGIN TRY
-		TRUNCATE TABLE [masterdb].[dbo].[tempNextProductId];
-		DECLARE @maxIDuser INT;
 
-		INSERT INTO [masterdb].[dbo].[tempNextProductId]
-		EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcGetNextUserId];
-
-		INSERT INTO [masterdb].[dbo].[tempNextProductId]
-		EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcGetNextUserId];
-
-		INSERT INTO [masterdb].[dbo].[tempNextProductId]
-		EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcGetNextUserId];
-
-		SELECT @maxIDuser = (MAX(maxIDuser) + 1) FROM [masterdb].[dbo].[tempNextProductId];
-
-		INSERT INTO [masterdb].[dbo].[tempNextProductId]
-		VALUES (@maxIDuser);
-
-		DELETE [masterdb].[dbo].[tempNextProductId] WHERE maxIDuser < @maxIDuser;
-
-		IF @select = 1
-			SELECT @maxIDuser AS maxIDuser;
-
-	END TRY 
-	BEGIN CATCH
-	SELECT
-	  ERROR_NUMBER() AS ErrorNumber  
-            ,ERROR_SEVERITY() AS ErrorSeverity  
-            ,ERROR_STATE() AS ErrorState  
-            ,ERROR_PROCEDURE() AS ErrorProcedure  
-            ,ERROR_LINE() AS ErrorLine  
-            ,ERROR_MESSAGE() AS ErrorMessage;
-
-	END CATCH
-
-END
-GO
-
-
---- Store procedure CreateProduct (Masterdb)
-CREATE PROCEDURE prcCreateProduct
-@idProduct int,
-@nameParam varchar(50),
-@typeParam int,
-@agedParam varchar(10),
-@presentationParam varchar(150),
-@imageParam image
-AS
-BEGIN
-	BEGIN TRY 
-		EXECUTE [masterdb].[dbo].[prcFindProductByName] @nameParam = @nameParam, @select = 0;
-
-		IF NOT EXISTS (SELECT * FROM [masterdb].[dbo].[tempProductJson])
-			BEGIN
-					EXECUTE [masterdb].[dbo].[prcGetNextProductId] @select = 0;
-
-					DECLARE @maxIDProduct int;
-					SELECT @maxIDProduct = MAX(@maxIDProduct) FROM [dbo].[tempNextProductId];  -- falta hacer lo de get next id de productos
-					
-					--insert product on the universal product database on MYSQL
-					EXEC ('Insert into product.product(idProduct, idType, name, features, image, createDate)
-							values (@maxIDProduct,@typeParam,@nameParam,@presentationParam, @imageParam, GETDATE()  )') AT [UNIVERSAL-MYSQL] 
-
-
-					--insert products on stores in the US
-					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcCreateProduct]  @maxIDProduct = @idProduct;
-					--insert products on stores in STK
-					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcCreateProduct]  @maxIDProduct = @idProduct;
-					--insert products on stores in IE
-					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcCreateProduct]  @maxIDProduct = @idProduct;
-	
-				ELSE
-					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
-
-				SELECT 'Created';
-			END
-		ELSE
-			BEGIN
-				RAISERROR ('Product already exist.', 11, 1);
-			END
-	END TRY 
-	BEGIN CATCH
-	SELECT
-	  ERROR_NUMBER() AS ErrorNumber  
-            ,ERROR_SEVERITY() AS ErrorSeverity  
-            ,ERROR_STATE() AS ErrorState  
-            ,ERROR_PROCEDURE() AS ErrorProcedure  
-            ,ERROR_LINE() AS ErrorLine  
-            ,ERROR_MESSAGE() AS ErrorMessage;
-
-	END CATCH
-
-END
-GO
 
 -- Store procedure for subscriptions
 CREATE PROCEDURE prcSubscription
@@ -293,14 +196,19 @@ AS
 BEGIN
 	BEGIN TRY 
 			BEGIN
+			-- find the country of the user 
 
 				IF @country = 'United States'
+					--call procedure on the country instance
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcSubscription] @iduser = @iduser, @idLevel = @idLevel;
 				ELSE IF @country = 'Scotland'
+					--call procedure on the country instance
 					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcSubscription] @iduser = @iduser, @idLevel = @idLevel;
 				ELSE IF @country = 'Ireland'
+					--call procedure on the country instance
 					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcSubscription] @iduser = @iduser, @idLevel = @idLevel;
 				ELSE
+					--print error 
 					RAISERROR ( 'Whoops, an error occurred.', 11, 1);
 
 				SELECT 'Subscription Updated';
@@ -365,18 +273,22 @@ GO
 
 -- EXECUTE prcGetStoresInfo
 
+
 CREATE PROCEDURE prcGetProductsInfo
 AS
 BEGIN
 	BEGIN TRY
+		-- declare table for storing the product info 
 		DECLARE @productsInfo TABLE
 		(idProduct int, 
 		 name varchar(50)
 		);
-
+		
+		-- insert the info from mysql into the table 
 		INSERT INTO @productsInfo
 		SELECT * FROM OPENQUERY ([UNIVERSAL-MYSQL] , 'SELECT idProduct, name FROM product.product')
-
+		
+		--return data as json 
 		IF EXISTS (SELECT idProduct, name FROM @productsInfo)
 			SELECT (SELECT idProduct, name FROM @productsInfo FOR JSON AUTO) AS productsInfo
 
@@ -525,17 +437,21 @@ BEGIN
 			 globalSalary money,
 			 deleted bit
 			);
-
+		-- insert all employees from Mysql universal database
 		insert into @storesEmployeesMYSQL
 		select * from OPENQUERY([UNIVERSAL-MYSQL], 'SELECT * FROM employee.employee')
 			BEGIN
+				-- call procedure on the country of the user
 				IF @country = 'United States'
+					-- insert all employees from selected store
 					insert into @storesEmployees
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindEmployeeByStore] @store = @store, @idEmployee = @idEmployee;
 				ELSE IF @country = 'Scotland'
+					-- insert all employees from selected store
 					insert into @storesEmployees
 					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindEmployeeByStore]@store = @store, @idEmployee =@idEmployee ;
 				ELSE IF @country = 'Ireland'
+					-- insert all employees from selected store
 					insert into @storesEmployees
 					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindEmployeeByStore]@store = @store , @idEmployee = @idEmployee;
 				ELSE
@@ -543,7 +459,8 @@ BEGIN
 
           
 			END
-
+			
+			-- select employee an returned it as a json
 			select(
 			select Eh.idEmployee, Ep.name, Ep.lastName, Ep.birthDate,Eh.localSalary,Eh.globalSalary from @storesEmployeesMYSQL Ep
             inner join (select * from @storesEmployees ) Eh on Eh.idEmployee = Ep.idEmployee
@@ -595,17 +512,20 @@ BEGIN
 			 deleted bit
 			);
 			
-
+		-- insert all employees from Mysql universal database
 		insert into @storesEmployeesMYSQL
 		select * from OPENQUERY([UNIVERSAL-MYSQL], 'SELECT * FROM employee.employee')
 			BEGIN
 				IF @country = 'United States'
+					-- insert all employees from selected store
 					insert into @storesEmployees
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcFindEmployeesByStore] @store = @store;
 				ELSE IF @country = 'Scotland'
+					-- insert all employees from selected store
 					insert into @storesEmployees
 					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcFindEmployeesByStore]@store = @store;
 				ELSE IF @country = 'Ireland'
+					-- insert all employees from selected store
 					insert into @storesEmployees
 					EXECUTE [IRELANDSQL].[ie_user].[dbo].[prcFindEmployeesByStore]@store = @store ;
 				ELSE
@@ -614,6 +534,7 @@ BEGIN
           
 			END
 
+			-- select all employees that are not deleted an returned it as a json
 			select(
 			select Eh.idEmployee, Ep.name, Ep.lastName, Ep.birthDate,Eh.localSalary,Eh.globalSalary from @storesEmployeesMYSQL Ep
             inner join (select * from @storesEmployees ) Eh on Eh.idEmployee = Ep.idEmployee
@@ -708,6 +629,7 @@ CREATE PROCEDURE prcUpdateEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
+		--update employee on Universal mysql database
 		DECLARE @select varchar(150),@update varchar(150),@sql varchar(300)
 		set @select = 'update OPENQUERY([UNIVERSAL-MYSQL],
 					''SELECT idEmployee,name,lastName,birthDate,updateDate FROM employee.employee where (idEmployee ='+ CAST(@idEmployee as nvarchar(30))+')'')'
@@ -719,8 +641,9 @@ BEGIN
 		set @sql = @select + @update
 		exec(@sql);
 
-        BEGIN
-            IF @country = 'United States'
+        	BEGIN		
+				-- call procedure on the country of the user
+            			IF @country = 'United States'
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcUpdateEmployeeByStore] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
 				ELSE IF @country = 'Scotland'
 					EXECUTE [SCOTLANDSQL].[stk_user].[dbo].[prcUpdateEmployeeByStore] @store=@store, @idEmployee = @idEmployee, @localSalary = @localSalary, @globalSalary=@globalSalary ;
@@ -770,14 +693,18 @@ CREATE PROCEDURE prcInsertEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
+	-- get the max idEmployee +1 and set it as the new idEmployee for the new insert
         DECLARE @maxIDuser int;
         SET @maxIDuser = 0; 
 		SELECT @maxIDuser = MAX(idEmployee) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idEmployee FROM employee.employee')
 		SET @maxIDuser = @maxIDuser+1; 
         
-			BEGIN
+			BEGIN	
+					-- insert the new employee into the universal Mysql employee database
 					INSERT OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idEmployee,name,lastName,birthDate,createDate,updateDate,deleted FROM employee.employee')   
 					VALUES(@maxIDuser,@name,@lastName,@birthDate,(SELECT GETDATE()),(SELECT GETDATE()),0)
+						
+		-- call procedure on the country of the user
             IF @country = 'United States'
 
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcInsertEmployeeByStore] @store=@store, @idEmployee = @maxIDuser, @localSalary = @localSalary, @globalSalary=@globalSalary ;
@@ -818,7 +745,7 @@ CREATE PROCEDURE prcDeleteEmployeeByStore
 AS
 BEGIN
 	BEGIN TRY 
-			
+			-- Update Universal Mysql employee database to deleted =1 on the selected idEmployee
 		DECLARE @select varchar(150),@update varchar(150),@sql varchar(300)
 		set @select = 'update OPENQUERY([UNIVERSAL-MYSQL],
 					''SELECT idEmployee,deleted FROM employee.employee where (idEmployee ='+ CAST(@idEmployee as nvarchar(30))+')'')'
@@ -828,7 +755,8 @@ BEGIN
 		EXEC(@sql)
 
             BEGIN
-					
+	    
+	    --find the country of the user and call the procedure for deleting the user by setting deleted =1			
             IF @country = 'United States'
 
 					EXECUTE [UNITEDSTATESSQL].[usa_user].[dbo].[prcDeleteEmployeeByStore] @Store=@store, @IdEmployee = @idEmployee;
@@ -870,7 +798,7 @@ CREATE PROCEDURE prcCreateProduct
 AS
 BEGIN
 	BEGIN TRY 
-	 
+	 -- get the max idProduc +1 and set it as the new idProduct for the new insert
 	 DECLARE @maxIDProduct int;
         SET @maxIDProduct = 0; 
 		SELECT @maxIDProduct = MAX(idProduct) FROM OPENQUERY([UNIVERSAL-MYSQL], 'SELECT idProduct FROM product.product')
