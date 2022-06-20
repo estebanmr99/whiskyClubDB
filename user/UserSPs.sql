@@ -7,6 +7,7 @@ CREATE PROCEDURE prcFindUserByEmail
 AS
 BEGIN
 	BEGIN TRY 
+	-- select user where email match
 		SELECT (		
 			SELECT idUser, idUserType, idLevel, email, password, name, lastName
         	FROM [dbo].[user]
@@ -35,6 +36,7 @@ CREATE PROCEDURE prcGetNextUserId
 AS
 BEGIN
 	BEGIN TRY 
+	-- get de max from  all the idUser
 		SELECT MAX(idUser) as maxIDuser
 		FROM [dbo].[user]
 	END TRY 
@@ -66,7 +68,8 @@ CREATE PROCEDURE prcRegisterUser
 AS
 BEGIN
 	BEGIN TRY 
-
+	
+		-- insert user into user database
 		INSERT INTO [dbo].[user] (idUser, idUserType, idLevel, email, password, name, lastName, telephone, location, createDate, updateDate, deleted)
 		VALUES (@idUser, 1, 0, @email, @password, @name, @lastName, @telephone, geography::Point(@locationLat, @locationLng, 4326), GETDATE(), GETDATE(), 0);
 
@@ -93,7 +96,7 @@ CREATE PROCEDURE prcSubscription
 AS
 BEGIN
 	BEGIN TRY 
-	
+		-- update the idLevel the the subscription given by the user
 		update [dbo].[user] 
 		SET idLevel = @idLevel
 		WHERE idUser = @idUser
@@ -122,7 +125,7 @@ BEGIN
 		DECLARE @localPrice money
 		 set @localPrice = @globalPrice
 	BEGIN TRY 
-
+		-- insert product into all the store
 		INSERT INTO [usa_store1].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
 		VALUES (@idProduct, 'USD',@localPrice ,@globalPrice, @image);
 		INSERT INTO [usa_store2].[dbo].[product] (idProduct, currency, localPrice, globalPrice, image)
@@ -150,7 +153,8 @@ AS
 BEGIN
 	BEGIN TRY 
 			BEGIN
-				IF @store = 7
+	-- find all employees that are not deleted		
+	IF @store = 7
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store1].[dbo].[employee] eh
 					WHERE deleted =0
 
@@ -190,15 +194,16 @@ AS
 BEGIN
 	BEGIN TRY 
 			BEGIN
+			-- find specific employee that macth idEmployee	 on store1
 				IF @store = 7
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store1].[dbo].[employee] eh
 					WHERE eh.idEmployee = @idEmployee 
 
-
+	-- find specific employee that macth idEmployee	on store2
         ELSE IF @store = 8
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store2].[dbo].[employee] eh
 					WHERE eh.idEmployee = @idEmployee 
-
+	-- find specific employee that macth idEmployee	 on store3
         ELSE IF @store = 9
 					SELECT idEmployee, localSalary, globalSalary, deleted FROM [usa_store3].[dbo].[employee] eh
 					WHERE eh.idEmployee = @idEmployee 
@@ -273,6 +278,7 @@ AS
 BEGIN
 	BEGIN TRY 
 			BEGIN
+			-- insert employee by specific store
 		IF @store = 7
 					INSERT INTO [usa_store1].[dbo].[employee](idEmployee,localSalary,globalSalary,deleted)
 					VALUES (@idEmployee,@localSalary, @globalSalary,0)
@@ -311,6 +317,7 @@ AS
 BEGIN
 	BEGIN TRY 
 			BEGIN
+			-- delete employee by specific store
 		IF @store = 7
 					UPDATE [usa_store1].[dbo].[employee]
 					SET deleted = 1
@@ -350,6 +357,7 @@ CREATE PROCEDURE prcFindUserByEmail
 AS
 BEGIN
 	BEGIN TRY 
+	-- find user by email on the user database
 		SELECT (		
 			SELECT idUser, idUserType, idLevel, email, password, name, lastName
         	FROM [dbo].[user]
@@ -378,6 +386,7 @@ CREATE PROCEDURE prcGetNextUserId
 AS
 BEGIN
 	BEGIN TRY 
+		-- get the max idUser from user database
 		SELECT MAX(idUser) as maxIDuser
 		FROM [dbo].[user]
 	END TRY 
